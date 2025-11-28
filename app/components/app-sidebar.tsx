@@ -31,42 +31,42 @@ const data = {
   navMain: [
     {
       title: "Home",
-      url: "#",
+      url: "/admin/dashboard",
       icon: IconHome,
     },
     {
       title: "Batches",
-      url: "#",
+      url: "/admin/dashboard/batches",
       icon: IconSchool,
     },
     {
       title: "Create Batch",
-      url: "#",
+      url: "/admin/dashboard/create-batch",
       icon: IconPlus,
     },
     {
       title: "Learners",
-      url: "#",
+      url: "/admin/dashboard/learners",
       icon: IconUsers,
     },
     {
       title: "Add Learner",
-      url: "#",
+      url: "/admin/dashboard/add-learner",
       icon: IconPlus,
     },
     {
       title: "Grant Access",
-      url: "#",
+      url: "/admin/dashboard/grant-access",
       icon: IconAccessPoint,
     },
     {
       title: "Course Progress",
-      url: "#",
+      url: "/admin/dashboard/course-progress",
       icon: IconChartDots,
     },
     {
       title: "Download Invoices",
-      url: "#",
+      url: "/admin/dashboard/download-invoices",
       icon: IconDownload,
     },
   ],

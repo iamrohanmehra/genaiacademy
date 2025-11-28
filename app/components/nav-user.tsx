@@ -1,3 +1,7 @@
+"use client"
+
+import { useNavigate } from "react-router"
+import { toast } from "sonner"
 import {
   IconCreditCard,
   IconDotsVertical,
@@ -6,6 +10,7 @@ import {
   IconUserCircle,
 } from "@tabler/icons-react"
 
+import { supabase } from "~/lib/supabase"
 import {
   Avatar,
   AvatarFallback,
@@ -37,6 +42,25 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        toast.error("Failed to log out")
+        console.error(error)
+        return
+      }
+
+      toast.success("Logged out successfully")
+      navigate("/login")
+    } catch (error) {
+      toast.error("An error occurred during logout")
+      console.error(error)
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -96,7 +120,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <IconLogout />
               Log out
             </DropdownMenuItem>
