@@ -5,6 +5,7 @@ import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { toast } from "sonner"
 
 import { cn } from "~/lib/utils"
 import { Button } from "~/components/ui/button"
@@ -71,9 +72,50 @@ export function CreateBatchForm() {
         },
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
-        // Handle form submission
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        try {
+            // TODO: When Supabase database is connected, replace this with actual API call
+            // Example:
+            // const { data, error } = await supabase
+            //   .from('batches')
+            //   .insert([{
+            //     course_id: values.courseId,
+            //     batch_name: values.batchName,
+            //     teacher: values.teacher,
+            //     price: values.price,
+            //     amount_payable: values.amountPayable,
+            //     seat_limit: values.seatLimit,
+            //     class_type: values.classType,
+            //     start_date: values.startDate,
+            //     end_date: values.endDate,
+            //     whatsapp_link: values.whatsappLink,
+            //     resources_link: values.resourcesLink,
+            //     next_class_topic: values.nextClassTopic,
+            //     next_class_date: values.nextClassDate,
+            //     next_class_time: values.nextClassTime,
+            //     status: values.status,
+            //   }])
+            //
+            // if (error) {
+            //   toast.error(`Failed to create batch: ${error.message}`)
+            //   return
+            // }
+
+            console.log("Batch data:", values)
+
+            // Simulate API success
+            toast.success("Batch created successfully!", {
+                description: `${values.batchName} has been added to the system.`,
+            })
+
+            // Reset form after successful submission
+            form.reset()
+        } catch (error) {
+            console.error("Error creating batch:", error)
+            toast.error("Failed to create batch", {
+                description: "An unexpected error occurred. Please try again.",
+            })
+        }
     }
 
     return (
