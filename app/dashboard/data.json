@@ -1,0 +1,137 @@
+[
+  {
+    "id": 1,
+    "header": "GenAI Fundamentals - Batch A",
+    "type": "Live Cohort",
+    "status": "In Progress",
+    "target": "45",
+    "limit": "50",
+    "reviewer": "Dr. Sarah Chen"
+  },
+  {
+    "id": 2,
+    "header": "LLM Engineering - Batch B",
+    "type": "Live Cohort",
+    "status": "Not Started",
+    "target": "20",
+    "limit": "40",
+    "reviewer": "Alex Rivera"
+  },
+  {
+    "id": 3,
+    "header": "Prompt Engineering Pro",
+    "type": "Self-Paced",
+    "status": "Done",
+    "target": "120",
+    "limit": "Unlimited",
+    "reviewer": "Maya Johnson"
+  },
+  {
+    "id": 4,
+    "header": "Advanced RAG Systems",
+    "type": "Workshop",
+    "status": "In Progress",
+    "target": "28",
+    "limit": "30",
+    "reviewer": "Dr. Sarah Chen"
+  },
+  {
+    "id": 5,
+    "header": "AI Ethics & Safety",
+    "type": "Self-Paced",
+    "status": "Done",
+    "target": "85",
+    "limit": "Unlimited",
+    "reviewer": "James Wilson"
+  },
+  {
+    "id": 6,
+    "header": "GenAI for Business Leaders",
+    "type": "Executive",
+    "status": "In Progress",
+    "target": "15",
+    "limit": "15",
+    "reviewer": "Elena Rodriguez"
+  },
+  {
+    "id": 7,
+    "header": "Computer Vision with Transformers",
+    "type": "Live Cohort",
+    "status": "Not Started",
+    "target": "12",
+    "limit": "35",
+    "reviewer": "David Kim"
+  },
+  {
+    "id": 8,
+    "header": "NLP Masterclass",
+    "type": "Live Cohort",
+    "status": "Done",
+    "target": "48",
+    "limit": "50",
+    "reviewer": "Alex Rivera"
+  },
+  {
+    "id": 9,
+    "header": "Generative Art & Design",
+    "type": "Workshop",
+    "status": "In Progress",
+    "target": "22",
+    "limit": "25",
+    "reviewer": "Maya Johnson"
+  },
+  {
+    "id": 10,
+    "header": "AI Agents Development",
+    "type": "Live Cohort",
+    "status": "Not Started",
+    "target": "30",
+    "limit": "40",
+    "reviewer": "Dr. Sarah Chen"
+  },
+  {
+    "id": 11,
+    "header": "Fine-tuning LLMs",
+    "type": "Workshop",
+    "status": "Done",
+    "target": "25",
+    "limit": "25",
+    "reviewer": "Alex Rivera"
+  },
+  {
+    "id": 12,
+    "header": "Vector Databases Deep Dive",
+    "type": "Self-Paced",
+    "status": "In Progress",
+    "target": "65",
+    "limit": "Unlimited",
+    "reviewer": "David Kim"
+  },
+  {
+    "id": 13,
+    "header": "Multi-Modal AI Systems",
+    "type": "Live Cohort",
+    "status": "In Progress",
+    "target": "38",
+    "limit": "45",
+    "reviewer": "Elena Rodriguez"
+  },
+  {
+    "id": 14,
+    "header": "AI Product Management",
+    "type": "Executive",
+    "status": "Done",
+    "target": "18",
+    "limit": "20",
+    "reviewer": "James Wilson"
+  },
+  {
+    "id": 15,
+    "header": "LangChain & LlamaIndex",
+    "type": "Workshop",
+    "status": "Not Started",
+    "target": "15",
+    "limit": "30",
+    "reviewer": "Maya Johnson"
+  }
+]
