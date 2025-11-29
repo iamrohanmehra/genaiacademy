@@ -62,124 +62,59 @@ export function SignupForm({
                 return
             }
 
-            // Sign up with Supabase
-            const { data, error } = await supabase.auth.signUp({
-                email: formData.email,
-                password: formData.password,
-                options: {
-                    data: {
-                        name: formData.name,
-                    },
-                    // Redirect to student dashboard by default (new users are students)
-                    emailRedirectTo: `${window.location.origin}/student/dashboard`
-                }
-            })
-
-            if (error) {
-                // Provide more helpful error messages
-                if (error.message.includes('already registered')) {
-                    toast.error("This email is already registered. Please login instead.")
-                } else if (error.message.includes('password')) {
-                    toast.error("Password must be at least 6 characters long")
-                } else if (error.message.includes('email')) {
-                    toast.error("Please enter a valid email address")
-                } else {
-                    toast.error(error.message)
-                }
+            const apiUrl = import.meta.env.VITE_API_URL
+            if (!apiUrl) {
+                toast.error("API URL not configured")
+                setLoading(false)
                 return
             }
 
-            if (data.user && data.session) {
-                // Get the JWT access token
-                const token = data.session.access_token
+            // Call Backend Signup API
+            const response = await fetch(`${apiUrl}/api/auth/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password,
+                    mobile: formData.mobile || undefined
+                })
+            })
 
-                // Create user in backend database
-                try {
-                    // Check if backend is available
-                    const apiUrl = import.meta.env.VITE_API_URL
+            const responseData = await response.json()
 
-                    if (!apiUrl) {
-                        console.warn('VITE_API_URL not configured. Skipping backend user creation.')
-                        toast.info("Account created! Note: Backend integration pending.")
+            if (!response.ok) {
+                throw new Error(responseData.error || 'Signup failed')
+            }
 
-                        // Check if email confirmation is required
-                        if (data.user.identities && data.user.identities.length === 0) {
-                            toast.info("Please check your email to confirm your account")
-                        } else {
-                            // For now, allow access without backend verification
-                            toast.success(`Account created successfully! Welcome, ${formData.name}`)
-                            navigate("/admin/dashboard")
-                        }
-                        return
-                    }
+            const { user, session } = responseData.data
 
-                    const response = await fetch(`${apiUrl}/api/auth/signup`, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            name: formData.name,
-                            email: formData.email,
-                            mobile: formData.mobile || null
-                        })
-                    })
+            // Sync session with Supabase client
+            if (session) {
+                const { error: sessionError } = await supabase.auth.setSession({
+                    access_token: session.access_token,
+                    refresh_token: session.refresh_token,
+                })
 
-                    if (!response.ok) {
-                        // Handle 404 - endpoint doesn't exist yet
-                        if (response.status === 404) {
-                            console.warn('Backend /api/auth/signup endpoint not found. User created in Supabase only.')
-                            toast.warning("Account created in Supabase. Backend integration pending.")
-
-                            // Check if email confirmation is required
-                            if (data.user.identities && data.user.identities.length === 0) {
-                                toast.info("Please check your email to confirm your account")
-                            } else {
-                                toast.info("You can login, but admin verification will be required once backend is ready.")
-                                navigate("/login")
-                            }
-                            return
-                        }
-
-                        const errorData = await response.json().catch(() => ({}))
-                        throw new Error(errorData.error || 'Failed to create user in database')
-                    }
-
-                    const { user: backendUser } = await response.json()
-
-                    // Check if email confirmation is required
-                    if (data.user.identities && data.user.identities.length === 0) {
-                        toast.info("Please check your email to confirm your account")
-                    } else {
-                        toast.success(`Account created successfully! Welcome, ${backendUser.name}`)
-
-                        // Route based on role
-                        if (backendUser.role === 'admin') {
-                            navigate("/admin/dashboard")
-                        } else {
-                            // Students and instructors go to student dashboard
-                            navigate("/student/dashboard")
-                        }
-                    }
-                } catch (backendError) {
-                    console.error('Backend user creation error:', backendError)
-
-                    // If it's a network error, the backend might be down
-                    if (backendError instanceof TypeError && backendError.message.includes('fetch')) {
-                        toast.warning("Account created in Supabase. Backend is not reachable.")
-                        toast.info("You can login once the backend is deployed.")
-                        navigate("/login")
-                    } else {
-                        toast.error(backendError instanceof Error ? backendError.message : "Failed to create user record")
-                        // Clean up Supabase user if backend creation fails
-                        await supabase.auth.signOut()
-                    }
+                if (sessionError) {
+                    console.error('Failed to set Supabase session:', sessionError)
                 }
             }
+
+            toast.success(`Account created successfully! Welcome, ${user.name}`)
+
+            // Route based on role
+            if (user.role === 'admin') {
+                navigate("/admin/dashboard")
+            } else {
+                navigate("/student/dashboard")
+            }
+
         } catch (error) {
-            toast.error("An error occurred during signup")
-            console.error(error)
+            console.error('Signup error:', error)
+            toast.error(error instanceof Error ? error.message : "An error occurred during signup")
         } finally {
             setLoading(false)
         }

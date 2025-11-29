@@ -6,4 +6,5 @@ export default [
     route("signup", "routes/signup.tsx"),
     route("admin/dashboard", "routes/admin/dashboard.tsx"),
     route("admin/dashboard/create-batch", "routes/admin/dashboard/create-batch.tsx"),
+    route("student/dashboard", "routes/student/dashboard.tsx"),
 ] satisfies RouteConfig;
