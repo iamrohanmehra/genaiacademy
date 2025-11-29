@@ -58,77 +58,72 @@ const data = {
       ],
     },
     {
-      title: "Batches",
-      url: "/admin/dashboard/batches",
+      title: "Courses",
+      url: "/admin/courses",
       icon: Bot,
       items: [
         {
-          title: "All Batches",
-          url: "/admin/dashboard/batches",
+          title: "All Courses",
+          url: "/admin/courses",
         },
         {
-          title: "Create Batch",
-          url: "/admin/dashboard/create-batch",
+          title: "Create Course",
+          url: "/admin/courses/create",
         },
         {
-          title: "Active Batches",
-          url: "/admin/dashboard/batches/active",
+          title: "Active Courses",
+          url: "/admin/courses/active",
         },
       ],
     },
     {
-      title: "Students",
-      url: "/admin/dashboard/students",
+      title: "Users",
+      url: "/admin/users",
       icon: BookOpen,
       items: [
         {
-          title: "All Students",
-          url: "/admin/dashboard/students",
+          title: "All Users",
+          url: "/admin/users",
         },
         {
           title: "Enrollments",
-          url: "/admin/dashboard/students/enrollments",
+          url: "/admin/enrollments",
         },
         {
           title: "Performance",
-          url: "/admin/dashboard/students/performance",
+          url: "/admin/users/performance",
         },
       ],
     },
     {
       title: "Settings",
-      url: "/admin/dashboard/settings",
+      url: "/admin/settings",
       icon: Settings2,
       items: [
         {
           title: "General",
-          url: "/admin/dashboard/settings",
+          url: "/admin/settings",
         },
         {
           title: "Users",
-          url: "/admin/dashboard/settings/users",
+          url: "/admin/settings/users",
         },
         {
           title: "Billing",
-          url: "/admin/dashboard/settings/billing",
+          url: "/admin/settings/billing",
         },
       ],
     },
   ],
   projects: [
     {
-      name: "Course Management",
-      url: "/admin/dashboard/courses",
-      icon: Frame,
-    },
-    {
       name: "Reports",
-      url: "/admin/dashboard/reports",
+      url: "/admin/reports",
       icon: PieChart,
     },
     {
       name: "Resources",
-      url: "/admin/dashboard/resources",
+      url: "/admin/resources",
       icon: Map,
     },
   ],
