@@ -22,11 +22,6 @@ import {
 } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
 
-// Mock admin credentials (for development/testing only)
-const MOCK_ADMIN = {
-  email: "admin@genai.academy",
-  password: "admin123"
-}
 
 export function LoginForm({
   className,
@@ -42,13 +37,6 @@ export function LoginForm({
     setLoading(true)
 
     try {
-      // Check for mock admin credentials
-      if (email === MOCK_ADMIN.email && password === MOCK_ADMIN.password) {
-        toast.success("Welcome back, Admin!")
-        navigate("/admin/dashboard")
-        return
-      }
-
       // Try Supabase authentication
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -60,9 +48,76 @@ export function LoginForm({
         return
       }
 
-      if (data.user) {
-        toast.success("Login successful!")
-        navigate("/admin/dashboard")
+      if (data.user && data.session) {
+        // Get the JWT access token
+        const token = data.session.access_token
+
+        // Verify user role with backend
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL
+
+          // If backend URL is not configured, allow login temporarily to student dashboard
+          if (!apiUrl) {
+            console.warn('VITE_API_URL not configured. Skipping role verification.')
+            toast.warning("Backend not configured. Proceeding without role verification.")
+            toast.success(`Welcome back!`)
+            navigate("/student/dashboard")
+            return
+          }
+
+          const response = await fetch(`${apiUrl}/api/auth/verify`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          })
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}))
+
+            // Handle 404 - endpoint doesn't exist yet
+            if (response.status === 404) {
+              console.warn('Backend /api/auth/verify endpoint not found.')
+              toast.warning("Backend verification not available yet.")
+              toast.info("Proceeding to student dashboard.")
+              navigate("/student/dashboard")
+              return
+            }
+
+            if (response.status === 403) {
+              toast.error("Account is not active or access denied")
+              await supabase.auth.signOut()
+              return
+            }
+
+            throw new Error(errorData.error || 'Failed to verify user')
+          }
+
+          const { user: userData } = await response.json()
+
+          // Route based on role
+          if (userData.role === 'admin') {
+            toast.success(`Welcome back, ${userData.name}!`)
+            navigate("/admin/dashboard")
+          } else if (userData.role === 'student' || userData.role === 'instructor') {
+            toast.success(`Welcome back, ${userData.name}!`)
+            navigate("/student/dashboard")
+          } else {
+            toast.error("Invalid user role")
+            await supabase.auth.signOut()
+          }
+        } catch (verifyError) {
+          console.error('User verification error:', verifyError)
+
+          // If it's a network error, the backend might be down
+          if (verifyError instanceof TypeError && verifyError.message.includes('fetch')) {
+            toast.warning("Backend is not reachable. Proceeding to student dashboard.")
+            navigate("/student/dashboard")
+          } else {
+            toast.error(verifyError instanceof Error ? verifyError.message : "Failed to verify user")
+            await supabase.auth.signOut()
+          }
+        }
       }
     } catch (error) {
       toast.error("An error occurred during login")
@@ -77,7 +132,7 @@ export function LoginForm({
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/admin/dashboard`
+          redirectTo: `${window.location.origin}/student/dashboard`
         }
       })
 
@@ -130,9 +185,6 @@ export function LoginForm({
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-                <FieldDescription className="text-xs">
-                  Demo: admin@genai.academy
-                </FieldDescription>
               </Field>
               <Field>
                 <div className="flex items-center">
@@ -151,9 +203,6 @@ export function LoginForm({
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <FieldDescription className="text-xs">
-                  Demo password: admin123
-                </FieldDescription>
               </Field>
               <Field>
                 <Button type="submit" disabled={loading}>

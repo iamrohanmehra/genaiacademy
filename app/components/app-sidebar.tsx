@@ -1,73 +1,135 @@
+"use client"
+
 import * as React from "react"
 import {
-  IconAccessPoint,
-  IconChartDots,
-  IconDownload,
-  IconHome,
-  IconInnerShadowTop,
-  IconPlus,
-  IconSchool,
-  IconUsers,
-} from "@tabler/icons-react"
+  AudioWaveform,
+  BookOpen,
+  Bot,
+  Command,
+  Frame,
+  GalleryVerticalEnd,
+  Map,
+  PieChart,
+  Settings2,
+  SquareTerminal,
+} from "lucide-react"
 
 import { NavMain } from "~/components/nav-main"
+import { NavProjects } from "~/components/nav-projects"
 import { NavUser } from "~/components/nav-user"
+import { TeamSwitcher } from "~/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarRail,
 } from "~/components/ui/sidebar"
 
+// This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "Admin User",
+    email: "admin@genaiacademy.com",
+    avatar: "/avatars/admin.jpg",
   },
+  teams: [
+    {
+      name: "GenAI Academy",
+      logo: GalleryVerticalEnd,
+      plan: "Enterprise",
+    },
+  ],
   navMain: [
     {
-      title: "Home",
+      title: "Dashboard",
       url: "/admin/dashboard",
-      icon: IconHome,
+      icon: SquareTerminal,
+      isActive: true,
+      items: [
+        {
+          title: "Overview",
+          url: "/admin/dashboard",
+        },
+        {
+          title: "Analytics",
+          url: "/admin/dashboard/analytics",
+        },
+      ],
     },
     {
       title: "Batches",
       url: "/admin/dashboard/batches",
-      icon: IconSchool,
+      icon: Bot,
+      items: [
+        {
+          title: "All Batches",
+          url: "/admin/dashboard/batches",
+        },
+        {
+          title: "Create Batch",
+          url: "/admin/dashboard/create-batch",
+        },
+        {
+          title: "Active Batches",
+          url: "/admin/dashboard/batches/active",
+        },
+      ],
     },
     {
-      title: "Create Batch",
-      url: "/admin/dashboard/create-batch",
-      icon: IconPlus,
+      title: "Students",
+      url: "/admin/dashboard/students",
+      icon: BookOpen,
+      items: [
+        {
+          title: "All Students",
+          url: "/admin/dashboard/students",
+        },
+        {
+          title: "Enrollments",
+          url: "/admin/dashboard/students/enrollments",
+        },
+        {
+          title: "Performance",
+          url: "/admin/dashboard/students/performance",
+        },
+      ],
     },
     {
-      title: "Learners",
-      url: "/admin/dashboard/learners",
-      icon: IconUsers,
+      title: "Settings",
+      url: "/admin/dashboard/settings",
+      icon: Settings2,
+      items: [
+        {
+          title: "General",
+          url: "/admin/dashboard/settings",
+        },
+        {
+          title: "Users",
+          url: "/admin/dashboard/settings/users",
+        },
+        {
+          title: "Billing",
+          url: "/admin/dashboard/settings/billing",
+        },
+      ],
+    },
+  ],
+  projects: [
+    {
+      name: "Course Management",
+      url: "/admin/dashboard/courses",
+      icon: Frame,
     },
     {
-      title: "Add Learner",
-      url: "/admin/dashboard/add-learner",
-      icon: IconPlus,
+      name: "Reports",
+      url: "/admin/dashboard/reports",
+      icon: PieChart,
     },
     {
-      title: "Grant Access",
-      url: "/admin/dashboard/grant-access",
-      icon: IconAccessPoint,
-    },
-    {
-      title: "Course Progress",
-      url: "/admin/dashboard/course-progress",
-      icon: IconChartDots,
-    },
-    {
-      title: "Download Invoices",
-      url: "/admin/dashboard/download-invoices",
-      icon: IconDownload,
+      name: "Resources",
+      url: "/admin/dashboard/resources",
+      icon: Map,
     },
   ],
 }
@@ -76,26 +138,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <a href="#">
-                <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">GenAI Academy</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   )
 }

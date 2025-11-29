@@ -4,7 +4,6 @@ import {
   IconClock,
   IconCurrencyDollar,
   IconSchool,
-  IconTrendingDown,
   IconTrendingUp,
   IconUserPlus,
 } from "@tabler/icons-react"
