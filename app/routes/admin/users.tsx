@@ -48,7 +48,7 @@ export type User = {
     name: string
     email: string
     mobile: string | null
-    role: "student" | "admin" | "instructor"
+    role: "student" | "admin" | "instructor" | "operations"
     status: "active" | "banned" | "suspended"
     createdAt: string
     lastActivity: string | null
@@ -226,6 +226,12 @@ export default function UsersPage() {
         },
         placeholderData: keepPreviousData,
     })
+
+    React.useEffect(() => {
+        if (isError) {
+            toast.error("Failed to fetch users. Please check console for details.")
+        }
+    }, [isError])
 
     const data = React.useMemo(() => queryData?.data || [], [queryData])
     const totalCount = React.useMemo(() => queryData?.count || queryData?.data?.length || 0, [queryData])

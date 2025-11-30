@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router"
 import { toast } from "sonner"
 import { format } from "date-fns"
@@ -13,9 +13,7 @@ import {
     Ban,
     CheckCircle,
     MoreHorizontal,
-    Edit,
     Loader2,
-    MapPin,
     Camera,
     Key,
     Trash2
@@ -292,6 +290,7 @@ function ProfileHeader({ user, onStatusChange, actionLoading, onUserUpdated }: {
 
 
 function DeleteUserDialog({ user, open, onOpenChange }: { user: UserDetails, open: boolean, onOpenChange: (open: boolean) => void }) {
+    const queryClient = useQueryClient()
     const navigate = useNavigate()
     const [nameInput, setNameInput] = useState("")
     const [confirmInput, setConfirmInput] = useState("")
@@ -320,6 +319,7 @@ function DeleteUserDialog({ user, open, onOpenChange }: { user: UserDetails, ope
             const result = await response.json()
             if (result.success) {
                 toast.success("User deleted successfully")
+                await queryClient.invalidateQueries({ queryKey: ['users'] })
                 navigate("/admin/users")
             }
         } catch (error) {

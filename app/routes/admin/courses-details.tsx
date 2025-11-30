@@ -13,8 +13,7 @@ import {
     DollarSign,
     BookOpen,
     Loader2,
-    Trash2,
-    Edit
+    Trash2
 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"

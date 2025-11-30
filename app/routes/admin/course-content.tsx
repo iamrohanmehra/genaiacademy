@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useId, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router"
 import {
     DndContext,
@@ -10,7 +10,6 @@ import {
     useSensor,
     useSensors,
     DragOverlay,
-    defaultDropAnimationSideEffects,
     type DragStartEvent,
     type DragOverEvent,
     type DragEndEvent,
@@ -34,8 +33,7 @@ import {
     ArrowLeft,
     FileText,
     Video,
-    Calendar as CalendarIcon,
-    MoreVertical
+    Calendar as CalendarIcon
 } from "lucide-react"
 import { toast } from "sonner"
 import { format } from "date-fns"
