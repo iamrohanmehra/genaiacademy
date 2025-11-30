@@ -41,6 +41,8 @@ import {
 } from "~/components/ui/table"
 
 import { supabase } from "~/lib/supabase"
+import { api, ApiError } from "~/lib/api.client"
+import { useNavigate } from "react-router"
 
 // Define User Type
 export type User = {
@@ -72,6 +74,7 @@ export const columns: ColumnDef<User>[] = [
                 checked={row.getIsSelected()}
                 onCheckedChange={(value) => row.toggleSelected(!!value)}
                 aria-label="Select row"
+                className={row.original.status === 'banned' ? 'border-black/50 data-[state=checked]:bg-black data-[state=checked]:border-black' : ''}
             />
         ),
         enableSorting: false,
@@ -173,6 +176,7 @@ export const columns: ColumnDef<User>[] = [
 ]
 
 export default function UsersPage() {
+    const navigate = useNavigate()
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -194,44 +198,44 @@ export default function UsersPage() {
         return () => clearTimeout(handler)
     }, [searchQuery])
 
-    const { data: queryData, isLoading, isError } = useQuery({
+    const { data: queryData, isLoading, isError, error } = useQuery({
         queryKey: ['users', page, debouncedQuery],
         queryFn: async () => {
             const { data: { session } } = await supabase.auth.getSession()
             const token = session?.access_token
 
             if (!token) {
-                throw new Error("Unauthorized")
+                throw new ApiError("Unauthorized", 401)
             }
 
-            const apiUrl = import.meta.env.VITE_API_URL
             const offset = (page - 1) * limit
+            let endpoint = `/api/admin/users?limit=${limit}&offset=${offset}`
 
-            let url = `${apiUrl}/api/admin/users?limit=${limit}&offset=${offset}`
             if (debouncedQuery) {
-                url = `${apiUrl}/api/admin/users/search?q=${encodeURIComponent(debouncedQuery)}`
+                endpoint = `/api/admin/users/search?q=${encodeURIComponent(debouncedQuery)}`
             }
 
-            const response = await fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch users')
-            }
-
-            return response.json()
+            return api.get<{ data: User[], count: number }>(endpoint, token)
         },
         placeholderData: keepPreviousData,
+        retry: (failureCount, error) => {
+            if (error instanceof ApiError && error.status === 401) {
+                return false
+            }
+            return failureCount < 3
+        }
     })
 
     React.useEffect(() => {
-        if (isError) {
-            toast.error("Failed to fetch users. Please check console for details.")
+        if (isError && error) {
+            if (error instanceof ApiError && error.status === 401) {
+                toast.error("Session expired. Please login again.")
+                navigate("/login")
+            } else {
+                toast.error("Failed to fetch users. Please check console for details.")
+            }
         }
-    }, [isError])
+    }, [isError, error, navigate])
 
     const data = React.useMemo(() => queryData?.data || [], [queryData])
     const totalCount = React.useMemo(() => queryData?.count || queryData?.data?.length || 0, [queryData])

@@ -4,6 +4,13 @@ interface FetchOptions extends RequestInit {
     token?: string
 }
 
+export class ApiError extends Error {
+    constructor(public message: string, public status: number, public data?: any) {
+        super(message)
+        this.name = 'ApiError'
+    }
+}
+
 export class ApiClient {
     private baseUrl: string
 
@@ -33,7 +40,7 @@ export class ApiClient {
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({}))
-            throw new Error(error.message || `HTTP ${response.status}`)
+            throw new ApiError(error.message || `HTTP ${response.status}`, response.status, error)
         }
 
         return response.json()

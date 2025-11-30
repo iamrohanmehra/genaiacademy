@@ -65,6 +65,7 @@ import { AppSidebar } from "~/components/app-sidebar"
 import { SiteHeader } from "~/components/site-header"
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar"
 import { supabase } from "~/lib/supabase"
+import { api, ApiError } from "~/lib/api.client"
 
 type Enrollment = {
     courseId: string
@@ -124,19 +125,7 @@ function EditUserDialog({ user, open, onOpenChange, onUserUpdated }: { user: Use
             const token = session?.access_token
             if (!token) return
 
-            const apiUrl = import.meta.env.VITE_API_URL
-            const response = await fetch(`${apiUrl}/api/admin/users/${user.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(formData)
-            })
-
-            if (!response.ok) throw new Error('Failed to update user')
-
-            const result = await response.json()
+            const result = await api.put<{ success: boolean }>(`/api/admin/users/${user.id}`, formData, token)
             if (result.success) {
                 toast.success("User updated successfully")
                 onUserUpdated()
@@ -306,17 +295,7 @@ function DeleteUserDialog({ user, open, onOpenChange }: { user: UserDetails, ope
             const token = session?.access_token
             if (!token) return
 
-            const apiUrl = import.meta.env.VITE_API_URL
-            const response = await fetch(`${apiUrl}/api/admin/users/${user.id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-
-            if (!response.ok) throw new Error('Failed to delete user')
-
-            const result = await response.json()
+            const result = await api.delete<{ success: boolean }>(`/api/admin/users/${user.id}`, token)
             if (result.success) {
                 toast.success("User deleted successfully")
                 await queryClient.invalidateQueries({ queryKey: ['users'] })
@@ -541,22 +520,11 @@ export default function UserDetailsPage() {
             const token = session?.access_token
 
             if (!token) {
-                throw new Error("Unauthorized")
+                throw new ApiError("Unauthorized", 401)
             }
 
-            const apiUrl = import.meta.env.VITE_API_URL
-            const response = await fetch(`${apiUrl}/api/admin/users/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch user details')
-            }
-
-            const result = await response.json()
-            return result.data as UserDetails
+            const result = await api.get<{ data: UserDetails }>(`/api/admin/users/${id}`, token)
+            return result.data
         },
         enabled: !!id,
     })
@@ -571,24 +539,13 @@ export default function UserDetailsPage() {
 
             if (!token) return
 
-            const apiUrl = import.meta.env.VITE_API_URL
             const endpoint = newStatus === 'banned' ? 'ban' : 'activate'
+            const result = await api.post<{ success: boolean }>(`/api/admin/users/${id}/${endpoint}`, {}, token)
 
-            const response = await fetch(`${apiUrl}/api/admin/users/${id}/${endpoint}`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-
-            if (!response.ok) {
-                throw new Error(`Failed to ${endpoint} user`)
-            }
-
-            const result = await response.json()
             if (result.success) {
                 toast.success(`User ${newStatus === 'banned' ? 'banned' : 'activated'} successfully`)
                 queryClient.invalidateQueries({ queryKey: ['user', id] })
+                queryClient.invalidateQueries({ queryKey: ['users'] })
             }
         } catch (error) {
             console.error(`Error changing status:`, error)

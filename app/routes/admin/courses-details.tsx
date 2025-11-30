@@ -38,6 +38,7 @@ import { AppSidebar } from "~/components/app-sidebar"
 import { SiteHeader } from "~/components/site-header"
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar"
 import { supabase } from "~/lib/supabase"
+import { api, ApiError } from "~/lib/api.client"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -84,22 +85,11 @@ export default function CourseDetailsPage() {
             const token = session?.access_token
 
             if (!token) {
-                throw new Error("Unauthorized")
+                throw new ApiError("Unauthorized", 401)
             }
 
-            const apiUrl = import.meta.env.VITE_API_URL
-            const response = await fetch(`${apiUrl}/api/admin/courses/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch course details')
-            }
-
-            const result = await response.json()
-            return result.data as Course
+            const result = await api.get<{ data: Course }>(`/api/admin/courses/${id}`, token)
+            return result.data
         },
         enabled: !!id,
     })

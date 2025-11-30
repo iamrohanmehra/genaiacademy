@@ -43,6 +43,7 @@ import { AppSidebar } from "~/components/app-sidebar"
 import { SiteHeader } from "~/components/site-header"
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar"
 import { supabase } from "~/lib/supabase"
+import { api, ApiError } from "~/lib/api.client"
 import { Badge } from "~/components/ui/badge"
 
 // Define Course Type
@@ -202,23 +203,11 @@ export default function CoursesPage() {
             const token = session?.access_token
 
             if (!token) {
-                throw new Error("Unauthorized")
+                throw new ApiError("Unauthorized", 401)
             }
-
-            const apiUrl = import.meta.env.VITE_API_URL
 
             // Note: API docs don't specify search/pagination for courses yet, fetching all
-            const response = await fetch(`${apiUrl}/api/admin/courses`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch courses')
-            }
-
-            return response.json()
+            return api.get<{ data: Course[] }>('/api/admin/courses', token)
         },
         placeholderData: keepPreviousData,
     })

@@ -39,6 +39,7 @@ import { AppSidebar } from "~/components/app-sidebar"
 import { SiteHeader } from "~/components/site-header"
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar"
 import { supabase } from "~/lib/supabase"
+import { api } from "~/lib/api.client"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card"
 
 const formSchema = z.object({
@@ -101,8 +102,6 @@ export default function CreateCoursePage() {
                 return
             }
 
-            const apiUrl = import.meta.env.VITE_API_URL
-
             // Format dates to ISO string for API
             const rawPayload = {
                 ...values,
@@ -118,29 +117,7 @@ export default function CreateCoursePage() {
                 Object.entries(rawPayload).filter(([_, v]) => v !== "")
             );
 
-            const response = await fetch(`${apiUrl}/api/admin/courses`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(payload)
-            })
-
-            if (!response.ok) {
-                let errorData;
-                try {
-                    errorData = await response.json();
-                } catch (e) {
-                    const text = await response.text();
-                    console.error("Non-JSON error response:", text);
-                    throw new Error(`Server error: ${response.status} ${response.statusText}`);
-                }
-                console.error("API Error:", errorData);
-                throw new Error(errorData.error || 'Failed to create course');
-            }
-
-            const result = await response.json()
+            const result = await api.post<{ success: boolean }>('/api/admin/courses', payload, token)
             if (result.success) {
                 toast.success("Course created successfully")
                 navigate("/admin/courses")
