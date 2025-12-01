@@ -17,5 +17,7 @@ export default [
         route("admin/courses/:id/content", "routes/admin/course-content.tsx"),
     ]),
 
+    route("debug-token", "routes/debug-token.tsx"),
+
     route("student/dashboard", "routes/student/dashboard.tsx"),
 ] satisfies RouteConfig;
