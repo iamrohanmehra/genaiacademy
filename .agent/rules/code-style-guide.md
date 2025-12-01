@@ -43,6 +43,7 @@ This is a **STRICTLY FRONTEND** repository.
 - **Invalidation**: Always invalidate relevant query keys (e.g., `queryClient.invalidateQueries({ queryKey: queryKeys.users.all })`) after a successful mutation.
 - **Stale Data**: Use `refetchOnMount: true` for lists that need to reflect immediate changes after navigation (e.g., returning from a detail page after an edit).
 - **Optimistic Updates**: Implement optimistic updates for UI interactions that require immediate feedback (e.g., drag-and-drop reordering, toggle switches) before the API call completes.
+- **Granular Fetching**: For nested lists (e.g., sections -> chapters), prefer fetching child data per parent item using `useQueries` or similar patterns to allow for targeted cache invalidation and updates.
 
 ### Navigation & Routing
 - Use `<Link>` from `react-router` for all internal navigation. **NEVER** use `<a>` tags for internal links as they cause full page reloads.

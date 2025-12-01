@@ -6,6 +6,8 @@ export const queryKeys = {
         sections: (id: string) => ['course', id, 'sections'] as const,
         section: (id: string) => ['section', id] as const,
         content: (id: string) => ['course', id, 'content'] as const,
+        sectionContent: (sectionId: string) => ['section', sectionId, 'content'] as const,
+        contentDetail: (id: string) => ['content', id] as const,
         search: (query: string) => ['courses', 'search', query] as const,
     },
     users: {

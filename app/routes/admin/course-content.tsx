@@ -37,7 +37,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { format } from "date-fns"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient, useQueries } from "@tanstack/react-query"
 
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
@@ -230,27 +230,40 @@ export default function CourseContentPage() {
         enabled: !!courseId,
     })
 
-    // Fetch Content
-    const { data: contentData } = useQuery({
-        queryKey: queryKeys.courses.content(courseId || ''),
-        queryFn: () => api.get<{ data: CourseContent[] }>(`/api/admin/courses/${courseId}/content`),
-        enabled: !!courseId,
+    const sectionIds = sectionsData?.data?.map(s => s.id) || []
+
+    // Fetch Content for each section
+    const contentQueries = useQueries({
+        queries: sectionIds.map(sectionId => ({
+            queryKey: queryKeys.courses.sectionContent(sectionId),
+            queryFn: () => api.get<{ data: CourseContent[] }>(`/api/admin/sections/${sectionId}/content`),
+        }))
+    })
+
+    // Fetch Selected Chapter Details
+    const { data: selectedChapterData } = useQuery({
+        queryKey: queryKeys.courses.contentDetail(selectedChapterId || ''),
+        queryFn: () => api.get<{ data: CourseContent }>(`/api/admin/content/${selectedChapterId}`),
+        enabled: !!selectedChapterId,
     })
 
     // Combine Data
     useEffect(() => {
-        if (sectionsData?.data && contentData?.data) {
-            const combined: SectionWithContent[] = sectionsData.data.map(section => ({
-                ...section,
-                isExpanded: true, // Default to expanded
-                chapters: contentData.data
-                    .filter(c => c.sectionId === section.id)
-                    .sort((a, b) => a.order - b.order)
-            })).sort((a, b) => a.order - b.order)
+        if (sectionsData?.data) {
+            const combined: SectionWithContent[] = sectionsData.data.map((section, index) => {
+                const contentQuery = contentQueries[index]
+                const chapters = contentQuery?.data?.data || []
+
+                return {
+                    ...section,
+                    isExpanded: true, // Default to expanded
+                    chapters: chapters.sort((a, b) => a.order - b.order)
+                }
+            }).sort((a, b) => a.order - b.order)
 
             setSections(combined)
         }
-    }, [sectionsData, contentData])
+    }, [sectionsData, ...contentQueries.map(q => q.data)])
 
     // --- Mutations ---
 
@@ -291,10 +304,10 @@ export default function CourseContentPage() {
                 courseId,
                 title: "New Chapter",
                 type: "video",
-                order: sections.find(s => s.id === sectionId)?.chapters.length || 0 + 1
+                order: (sections.find(s => s.id === sectionId)?.chapters.length || 0) + 1
             }),
-        onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.courses.content(courseId!) })
+        onSuccess: (data, sectionId) => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.sectionContent(sectionId) })
             setSelectedChapterId(data.data.id)
             toast.success("Chapter added")
         },
@@ -303,19 +316,28 @@ export default function CourseContentPage() {
 
     const deleteChapterMutation = useMutation({
         mutationFn: (chapterId: string) => api.delete(`/api/admin/content/${chapterId}`),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.courses.content(courseId!) })
-            setSelectedChapterId(null)
+        onSuccess: (data, deletedChapterId) => {
+            sectionIds.forEach(id => queryClient.invalidateQueries({ queryKey: queryKeys.courses.sectionContent(id) }))
+
+            if (selectedChapterId === deletedChapterId) {
+                setSelectedChapterId(null)
+            }
             toast.success("Chapter deleted")
         },
         onError: (error: ApiError) => toast.error(error.message)
     })
-
     const updateChapterMutation = useMutation({
         mutationFn: ({ id, data }: { id: string, data: Partial<CourseContent> }) =>
             api.put(`/api/admin/content/${id}`, data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: queryKeys.courses.content(courseId!) })
+        onSuccess: (data, variables) => {
+            // Invalidate the specific section and the content detail
+            const chapter = sections.flatMap(s => s.chapters).find(c => c.id === variables.id)
+            if (chapter) {
+                queryClient.invalidateQueries({ queryKey: queryKeys.courses.sectionContent(chapter.sectionId) })
+            } else {
+                sectionIds.forEach(id => queryClient.invalidateQueries({ queryKey: queryKeys.courses.sectionContent(id) }))
+            }
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.contentDetail(variables.id) })
             toast.success("Chapter saved")
         },
         onError: (error: ApiError) => toast.error(error.message)
@@ -327,7 +349,7 @@ export default function CourseContentPage() {
         onSuccess: () => {
             // Optimistic update handled by local state, but we should invalidate to be safe
             queryClient.invalidateQueries({ queryKey: queryKeys.courses.sections(courseId!) })
-            queryClient.invalidateQueries({ queryKey: queryKeys.courses.content(courseId!) })
+            sectionIds.forEach(id => queryClient.invalidateQueries({ queryKey: queryKeys.courses.sectionContent(id) }))
         },
         onError: (error: ApiError) => toast.error(error.message)
     })
@@ -491,7 +513,7 @@ export default function CourseContentPage() {
         }
     }
 
-    const selectedChapter = sections
+    const selectedChapter = selectedChapterData?.data || sections
         .flatMap((s) => s.chapters)
         .find((c) => c.id === selectedChapterId)
 
