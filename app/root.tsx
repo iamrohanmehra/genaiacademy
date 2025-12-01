@@ -11,6 +11,11 @@ import type { Route } from "./+types/root";
 import { Toaster } from "~/components/ui/sonner";
 import "./app.css";
 
+export const meta: Route.MetaFunction = () => [
+  { title: "GenAI Academy" },
+  { name: "description", content: "GenAI Academy Admin Dashboard" },
+];
+
 
 
 export function Layout({ children }: { children: React.ReactNode }) {

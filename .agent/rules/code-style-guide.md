@@ -49,6 +49,7 @@ This is a **STRICTLY FRONTEND** repository.
 ### UI & Accessibility
 - **High Contrast**: Ensure interactive elements (like checkboxes) have sufficient contrast against their background.
 - **Conditional Styling**: When using colored row highlights (e.g., for banned users), adjust child element styles (borders, backgrounds) to ensure visibility.
+- **Icon-Only Buttons**: **ALWAYS** provide an `aria-label` for buttons that only contain an icon to ensure accessibility for screen readers.
 
 ### Component Structure
 - Use Functional Components with Hooks.
@@ -62,6 +63,9 @@ This is a **STRICTLY FRONTEND** repository.
 - **Security**: Do not use Supabase Admin SDK or service keys in this repo. Client-side keys (`ANON_KEY`) only.
 - **Environment Variables**: Use `import.meta.env.VITE_*` for client-side variables. **NEVER** expose `SUPABASE_SERVICE_ROLE_KEY` to the client.
 
+### SEO & Meta Tags
+- **Page Titles**: Ensure every route (or the root layout) defines a `meta` export with a `title` to prevent missing `<title>` element issues.
+
 ## 4. Performance Optimization
 - **Virtualization**: Use `@tanstack/react-virtual` for long lists (e.g., Users table, Courses table) to ensure high performance.
 - **Lazy Loading**: Use `React.lazy` and `Suspense` for heavy UI components (e.g., `Calendar`, complex Dialogs) that are not immediately visible.
@@ -71,7 +75,9 @@ This is a **STRICTLY FRONTEND** repository.
 - **Prefetching**: Implement prefetching on hover (e.g., `onMouseEnter`) for critical navigation links to improve perceived speed.
 
 ## 5. Vercel Deployment Optimization
-- Ensure `vite.config.ts` and `react-router.config.ts` are optimized for Vercel.
+- **Configuration**: Ensure `vite.config.ts` and `react-router.config.ts` are optimized for Vercel.
+- **Presets**: **ALWAYS** use `vercelPreset()` in `react-router.config.ts`.
+- **Sourcemaps**: Disable sourcemaps for SSR builds (`sourcemap: !isSsrBuild`) in `vite.config.ts` to prevent build reporting errors.
 - Do not include heavy server-side dependencies that bloat the client bundle.
 - Respect the `build` script: `bun run build` (aliased to `react-router build`).
 

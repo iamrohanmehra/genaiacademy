@@ -139,6 +139,7 @@ function SortableSection({
                     {...attributes}
                     {...listeners}
                     className="cursor-grab text-muted-foreground hover:text-foreground"
+                    aria-label="Drag to reorder section"
                 >
                     <GripVertical className="h-5 w-5" />
                 </button>
@@ -159,6 +160,7 @@ function SortableSection({
                         size="icon"
                         onClick={() => onAddChapter(section.id)}
                         title="Add Chapter"
+                        aria-label="Add Chapter"
                     >
                         <Plus className="h-4 w-4" />
                     </Button>
@@ -168,6 +170,7 @@ function SortableSection({
                         onClick={() => onDelete(section.id)}
                         className="text-destructive hover:text-destructive"
                         title="Delete Section"
+                        aria-label="Delete Section"
                     >
                         <Trash2 className="h-4 w-4" />
                     </Button>
@@ -219,6 +222,7 @@ function SortableChapter({
                 {...listeners}
                 className="cursor-grab text-muted-foreground hover:text-foreground"
                 onClick={(e) => e.stopPropagation()}
+                aria-label="Drag to reorder chapter"
             >
                 <GripVertical className="h-4 w-4" />
             </button>
@@ -227,6 +231,7 @@ function SortableChapter({
             <button
                 onClick={onDelete}
                 className="text-muted-foreground hover:text-destructive"
+                aria-label="Delete chapter"
             >
                 <Trash2 className="h-4 w-4" />
             </button>
