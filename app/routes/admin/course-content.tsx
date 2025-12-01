@@ -55,6 +55,7 @@ const Calendar = React.lazy(() => import("~/components/ui/calendar").then(module
 import { api, ApiError } from "~/lib/api.client"
 import { queryKeys } from "~/lib/query-keys"
 import { cn } from "~/lib/utils"
+import { supabase } from "~/lib/supabase"
 
 import { Label } from "~/components/ui/label"
 import { Separator } from "~/components/ui/separator"
@@ -226,7 +227,12 @@ export default function CourseContentPage() {
     // Fetch Sections
     const { data: sectionsData } = useQuery({
         queryKey: queryKeys.courses.sections(courseId || ''),
-        queryFn: () => api.get<{ data: CourseSection[] }>(`/api/admin/courses/${courseId}/sections`),
+        queryFn: async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
+            return api.get<{ data: CourseSection[] }>(`/api/admin/courses/${courseId}/sections`, token)
+        },
         enabled: !!courseId,
     })
 
@@ -236,23 +242,34 @@ export default function CourseContentPage() {
     const contentQueries = useQueries({
         queries: sectionIds.map(sectionId => ({
             queryKey: queryKeys.courses.sectionContent(sectionId),
-            queryFn: () => api.get<{ data: CourseContent[] }>(`/api/admin/sections/${sectionId}/content`),
+            queryFn: async () => {
+                const { data: { session } } = await supabase.auth.getSession()
+                const token = session?.access_token
+                if (!token) throw new ApiError("Unauthorized", 401)
+                return api.get<{ data: CourseContent[] }>(`/api/admin/sections/${sectionId}/content`, token)
+            },
         }))
     })
 
     // Fetch Selected Chapter Details
     const { data: selectedChapterData } = useQuery({
         queryKey: queryKeys.courses.contentDetail(selectedChapterId || ''),
-        queryFn: () => api.get<{ data: CourseContent }>(`/api/admin/content/${selectedChapterId}`),
+        queryFn: async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
+            return api.get<{ data: CourseContent }>(`/api/admin/content/${selectedChapterId}`, token)
+        },
         enabled: !!selectedChapterId,
     })
+
+    const contentData = contentQueries.map(q => q.data)
 
     // Combine Data
     useEffect(() => {
         if (sectionsData?.data) {
             const combined: SectionWithContent[] = sectionsData.data.map((section, index) => {
-                const contentQuery = contentQueries[index]
-                const chapters = contentQuery?.data?.data || []
+                const chapters = contentData[index]?.data || []
 
                 return {
                     ...section,
@@ -263,16 +280,20 @@ export default function CourseContentPage() {
 
             setSections(combined)
         }
-    }, [sectionsData, ...contentQueries.map(q => q.data)])
+    }, [sectionsData, JSON.stringify(contentData)])
 
     // --- Mutations ---
 
     const createSectionMutation = useMutation({
-        mutationFn: (title: string) =>
-            api.post<{ data: CourseSection }>(`/api/admin/courses/${courseId}/sections`, {
+        mutationFn: async (title: string) => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
+            return api.post<{ data: CourseSection }>(`/api/admin/courses/${courseId}/sections`, {
                 title,
                 order: sections.length + 1
-            }),
+            }, token)
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.courses.sections(courseId!) })
             toast.success("Section created")
@@ -281,7 +302,12 @@ export default function CourseContentPage() {
     })
 
     const deleteSectionMutation = useMutation({
-        mutationFn: (sectionId: string) => api.delete(`/api/admin/sections/${sectionId}`),
+        mutationFn: async (sectionId: string) => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
+            return api.delete(`/api/admin/sections/${sectionId}`, token)
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.courses.sections(courseId!) })
             toast.success("Section deleted")
@@ -290,8 +316,12 @@ export default function CourseContentPage() {
     })
 
     const updateSectionMutation = useMutation({
-        mutationFn: ({ id, title }: { id: string, title: string }) =>
-            api.put(`/api/admin/sections/${id}`, { title }),
+        mutationFn: async ({ id, title }: { id: string, title: string }) => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
+            return api.put(`/api/admin/sections/${id}`, { title }, token)
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: queryKeys.courses.sections(courseId!) })
         },
@@ -299,13 +329,17 @@ export default function CourseContentPage() {
     })
 
     const createChapterMutation = useMutation({
-        mutationFn: (sectionId: string) =>
-            api.post<{ data: CourseContent }>(`/api/admin/sections/${sectionId}/content`, {
+        mutationFn: async (sectionId: string) => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
+            return api.post<{ data: CourseContent }>(`/api/admin/sections/${sectionId}/content`, {
                 courseId,
                 title: "New Chapter",
                 type: "video",
                 order: (sections.find(s => s.id === sectionId)?.chapters.length || 0) + 1
-            }),
+            }, token)
+        },
         onSuccess: (data, sectionId) => {
             queryClient.invalidateQueries({ queryKey: queryKeys.courses.sectionContent(sectionId) })
             setSelectedChapterId(data.data.id)
@@ -315,7 +349,12 @@ export default function CourseContentPage() {
     })
 
     const deleteChapterMutation = useMutation({
-        mutationFn: (chapterId: string) => api.delete(`/api/admin/content/${chapterId}`),
+        mutationFn: async (chapterId: string) => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
+            return api.delete(`/api/admin/content/${chapterId}`, token)
+        },
         onSuccess: (data, deletedChapterId) => {
             sectionIds.forEach(id => queryClient.invalidateQueries({ queryKey: queryKeys.courses.sectionContent(id) }))
 
@@ -327,8 +366,12 @@ export default function CourseContentPage() {
         onError: (error: ApiError) => toast.error(error.message)
     })
     const updateChapterMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string, data: Partial<CourseContent> }) =>
-            api.put(`/api/admin/content/${id}`, data),
+        mutationFn: async ({ id, data }: { id: string, data: Partial<CourseContent> }) => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
+            return api.put(`/api/admin/content/${id}`, data, token)
+        },
         onSuccess: (data, variables) => {
             // Invalidate the specific section and the content detail
             const chapter = sections.flatMap(s => s.chapters).find(c => c.id === variables.id)
@@ -344,8 +387,12 @@ export default function CourseContentPage() {
     })
 
     const reorderMutation = useMutation({
-        mutationFn: (payload: { type: 'section' | 'content', sortedOrder: { id: string, order: number }[] }) =>
-            api.put('/api/admin/sort-order', payload),
+        mutationFn: async (payload: { type: 'section' | 'content', sortedOrder: { id: string, order: number }[] }) => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
+            return api.put('/api/admin/sort-order', payload, token)
+        },
         onSuccess: () => {
             // Optimistic update handled by local state, but we should invalidate to be safe
             queryClient.invalidateQueries({ queryKey: queryKeys.courses.sections(courseId!) })
