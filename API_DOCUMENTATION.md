@@ -332,6 +332,118 @@ curl http://localhost:3000/api/admin/users \
 
 ---
 
+## 📊 Overview API
+
+Base path: `/api/admin/overview`
+
+### Get Overview Statistics
+
+**Endpoint:** `GET /api/admin/overview`
+
+**Description:** Get overview statistics with time-based filtering. Returns user signups, enrollments, paid enrollments, and revenue with comparison to previous period.
+
+**Query Parameters:**
+- `filter` (optional) - Time filter type. Default: `today`
+  - `today` - Today's data vs yesterday
+  - `yesterday` - Yesterday's data vs day before
+  - `thisWeek` - This week vs last week
+  - `thisMonth` - This month vs last month
+  - `lastMonth` - Last month vs month before
+  - `last90Days` - Last 90 days vs previous 90 days
+  - `customDate` - Specific date (requires `customDate` param)
+  - `customRange` - Date range (requires `startDate` and `endDate` params)
+- `customDate` (required for customDate filter) - Date in ISO format (e.g., `2024-11-15`)
+- `startDate` (required for customRange filter) - Start date in ISO format
+- `endDate` (required for customRange filter) - End date in ISO format
+
+**Examples:**
+
+```bash
+# Today (default)
+curl http://localhost:3000/api/admin/overview \
+  -H "Authorization: Bearer <your-jwt-token>"
+
+# Yesterday
+curl "http://localhost:3000/api/admin/overview?filter=yesterday" \
+  -H "Authorization: Bearer <your-jwt-token>"
+
+# This week
+curl "http://localhost:3000/api/admin/overview?filter=thisWeek" \
+  -H "Authorization: Bearer <your-jwt-token>"
+
+# This month
+curl "http://localhost:3000/api/admin/overview?filter=thisMonth" \
+  -H "Authorization: Bearer <your-jwt-token>"
+
+# Custom date (Nov 15, 2024)
+curl "http://localhost:3000/api/admin/overview?filter=customDate&customDate=2024-11-15" \
+  -H "Authorization: Bearer <your-jwt-token>"
+
+# Custom range (Nov 1-15, 2024)
+curl "http://localhost:3000/api/admin/overview?filter=customRange&startDate=2024-11-01&endDate=2024-11-15" \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "userSignups": {
+      "current": 10,
+      "previous": 8,
+      "change": 2,
+      "changePercentage": 25.0,
+      "trend": "up"
+    },
+    "totalEnrollments": {
+      "current": 15,
+      "previous": 12,
+      "change": 3,
+      "changePercentage": 25.0,
+      "trend": "up"
+    },
+    "paidEnrollments": {
+      "current": 8,
+      "previous": 5,
+      "change": 3,
+      "changePercentage": 60.0,
+      "trend": "up"
+    },
+    "totalRevenue": {
+      "current": 3599200,
+      "previous": 2249500,
+      "change": 1349700,
+      "changePercentage": 60.0,
+      "trend": "up"
+    }
+  },
+  "filter": "today"
+}
+```
+
+**Response Fields:**
+
+Each metric contains:
+- `current` (number) - Current period value
+- `previous` (number) - Previous period value
+- `change` (number) - Difference between current and previous
+- `changePercentage` (number) - Percentage change (handles 0 and infinity)
+- `trend` (string) - `"up"`, `"down"`, or `"neutral"`
+
+**Metrics:**
+- `userSignups` - Number of new user registrations
+- `totalEnrollments` - Total course enrollments
+- `paidEnrollments` - Enrollments where `hasPaid: true`
+- `totalRevenue` - Sum of `amountPaid` (in paise/cents)
+
+**Notes:**
+- Revenue is in paise/cents (divide by 100 for INR/USD display)
+- Comparison period is automatically calculated based on filter duration
+- Handles edge cases: zero division returns 0%, new data on zero baseline returns 100%
+
+---
+
 ## 👥 Users API
 
 Base path: `/api/admin/users`
@@ -361,6 +473,7 @@ curl http://localhost:3000/api/admin/users \
       "avatar": "https://example.com/avatar.jpg",
       "status": "active",
       "role": "admin",
+      "globalXp": 1250,
       "lastActivity": "2024-11-28T10:00:00Z",
       "createdAt": "2024-11-01T10:00:00Z",
       "updatedAt": "2024-11-28T10:00:00Z"
@@ -372,7 +485,47 @@ curl http://localhost:3000/api/admin/users \
 
 ---
 
-### 2. Search Users
+### 2. Search Users by Email (Dropdown)
+
+**Endpoint:** `GET /api/admin/users/search/email?q={email}`
+
+**Description:** Search users by email for dropdown selection. Returns limited fields (id, name, email, mobile, avatar) and max 20 results.
+
+**Query Parameters:**
+- `q` (required) - Email to search for (partial match)
+
+**Request:**
+```bash
+curl "http://localhost:3000/api/admin/users/search/email?q=john@example" \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "mobile": "+1234567890",
+      "avatar": "https://example.com/avatar.jpg"
+    },
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "name": "Johnny Smith",
+      "email": "johnny@example.com",
+      "mobile": "+1234567891",
+      "avatar": null
+    }
+  ]
+}
+```
+
+---
+
+### 3. Search Users
 
 **Endpoint:** `GET /api/admin/users/search?q={searchTerm}`
 
@@ -409,6 +562,7 @@ curl "http://localhost:3000/api/admin/users/search?q=1234567" \
       "avatar": "https://example.com/avatar.jpg",
       "status": "active",
       "role": "student",
+      "globalXp": 850,
       "lastActivity": "2024-11-28T10:00:00Z",
       "createdAt": "2024-11-01T10:00:00Z",
       "updatedAt": "2024-11-28T10:00:00Z"
@@ -436,7 +590,7 @@ curl "http://localhost:3000/api/admin/users/search?q=1234567" \
 
 ---
 
-### 3. Get User by ID (with Enrollments)
+### 4. Get User by ID (with Enrollments)
 
 **Endpoint:** `GET /api/admin/users/:id`
 
@@ -463,6 +617,7 @@ curl http://localhost:3000/api/admin/users/550e8400-e29b-41d4-a716-446655440000 
     "avatar": "https://example.com/avatar.jpg",
     "status": "active",
     "role": "student",
+    "globalXp": 500,
     "lastActivity": "2024-11-28T10:00:00Z",
     "createdAt": "2024-11-01T10:00:00Z",
     "updatedAt": "2024-11-28T10:00:00Z",
@@ -472,11 +627,12 @@ curl http://localhost:3000/api/admin/users/550e8400-e29b-41d4-a716-446655440000 
           "id": "750e8400-e29b-41d4-a716-446655440002",
           "userId": "550e8400-e29b-41d4-a716-446655440000",
           "courseId": "650e8400-e29b-41d4-a716-446655440001",
-          "amountPaid": "4499.00",
+          "amountPaid": 449900,
           "paidAt": "2024-11-28T10:00:00Z",
           "hasPaid": true,
           "progress": 45,
           "timeSpent": 3600,
+          "xp": 350,
           "status": "active",
           "certificateId": "CERT-001",
           "certificateGeneratedAt": "2025-03-01T10:00:00Z",
@@ -488,7 +644,7 @@ curl http://localhost:3000/api/admin/users/550e8400-e29b-41d4-a716-446655440000 
           "title": "Python Masterclass",
           "desc": "Learn Python from scratch to advanced",
           "type": "course",
-          "price": "4999.00",
+          "price": 499900,
           "status": "live",
           "startDate": "2024-12-01T00:00:00Z",
           "endDate": "2025-02-28T00:00:00Z"
@@ -515,7 +671,7 @@ curl http://localhost:3000/api/admin/users/550e8400-e29b-41d4-a716-446655440000 
 
 ---
 
-### 3. Update User
+### 5. Update User
 
 **Endpoint:** `PUT /api/admin/users/:id`
 
@@ -572,6 +728,7 @@ curl -X PUT http://localhost:3000/api/admin/users/550e8400-e29b-41d4-a716-446655
 - `avatar` (string, optional, URL)
 - `status` (enum: "active", "banned")
 - `role` (enum: "admin", "operations", "student")
+- `globalXp` (integer, default: 0) - Total experience points across all courses
 - `lastActivity` (timestamp)
 
 ---
@@ -674,7 +831,45 @@ curl -X DELETE http://localhost:3000/api/admin/users/550e8400-e29b-41d4-a716-446
 
 Base path: `/api/admin/courses`
 
-### 1. Get All Courses
+### 1. Search Courses (Dropdown)
+
+**Endpoint:** `GET /api/admin/courses/search?q={searchTerm}`
+
+**Description:** Search courses by title for dropdown selection. Returns limited fields (id, title, type, status) and max 20 results.
+
+**Query Parameters:**
+- `q` (required) - Search term to match against course title
+
+**Request:**
+```bash
+curl "http://localhost:3000/api/admin/courses/search?q=python" \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "650e8400-e29b-41d4-a716-446655440001",
+      "title": "Python Masterclass",
+      "type": "course",
+      "status": "live"
+    },
+    {
+      "id": "650e8400-e29b-41d4-a716-446655440002",
+      "title": "Python for Data Science",
+      "type": "workshop",
+      "status": "inProgress"
+    }
+  ]
+}
+```
+
+---
+
+### 2. Get All Courses
 
 **Endpoint:** `GET /api/admin/courses`
 
@@ -698,9 +893,10 @@ curl http://localhost:3000/api/admin/courses \
       "schedule": "Mon-Fri 7PM IST",
       "type": "course",
       "topic": 1,
-      "price": "4999.00",
-      "payable": "4499.00",
-      "certificateFee": "500.00",
+      "price": 499900,
+      "payable": 449900,
+      "priceInUsd": 5999,
+      "certificateFee": 50000,
       "association": "CodeKaro",
       "limit": 100,
       "banner": "https://example.com/banner.jpg",
@@ -722,7 +918,7 @@ curl http://localhost:3000/api/admin/courses \
 
 ---
 
-### 2. Get Course by ID
+### 3. Get Course by ID
 
 **Endpoint:** `GET /api/admin/courses/:id`
 
@@ -748,9 +944,10 @@ curl http://localhost:3000/api/admin/courses/650e8400-e29b-41d4-a716-44665544000
     "schedule": "Mon-Fri 7PM IST",
     "type": "course",
     "topic": 1,
-    "price": "4999.00",
-    "payable": "4499.00",
-    "certificateFee": "500.00",
+    "price": 499900,
+    "payable": 449900,
+    "priceInUsd": 5999,
+    "certificateFee": 50000,
     "association": "CodeKaro",
     "limit": 100,
     "banner": "https://example.com/banner.jpg",
@@ -770,7 +967,7 @@ curl http://localhost:3000/api/admin/courses/650e8400-e29b-41d4-a716-44665544000
 
 ---
 
-### 3. Create Course
+### 4. Create Course
 
 **Endpoint:** `POST /api/admin/courses`
 
@@ -784,9 +981,10 @@ curl http://localhost:3000/api/admin/courses/650e8400-e29b-41d4-a716-44665544000
   "schedule": "Mon-Fri 7PM IST",
   "type": "course",
   "topic": 1,
-  "price": "4999.00",
-  "payable": "4499.00",
-  "certificateFee": "500.00",
+  "price": 499900,
+  "payable": 449900,
+  "priceInUsd": 5999,
+  "certificateFee": 50000,
   "limit": 100,
   "startDate": "2024-12-01T00:00:00Z",
   "endDate": "2025-02-28T00:00:00Z",
@@ -805,9 +1003,10 @@ curl -X POST http://localhost:3000/api/admin/courses \
     "schedule": "Mon-Fri 7PM IST",
     "type": "course",
     "topic": 1,
-    "price": "4999.00",
-    "payable": "4499.00",
-    "certificateFee": "500.00",
+    "price": 499900,
+    "payable": 449900,
+    "priceInUsd": 5999,
+    "certificateFee": 50000,
     "limit": 100,
     "startDate": "2024-12-01T00:00:00Z",
     "endDate": "2025-02-28T00:00:00Z",
@@ -834,15 +1033,16 @@ curl -X POST http://localhost:3000/api/admin/courses \
 - `schedule` (string)
 - `type` (enum: "workshop", "course", "cohort", "mentorship")
 - `topic` (integer)
-- `price` (numeric)
-- `payable` (numeric)
-- `certificateFee` (numeric, default: 0)
+- `price` (integer) - **Amount in paise/cents** (e.g., 499900 = ₹4999.00)
+- `payable` (integer) - **Amount in paise/cents** (e.g., 449900 = ₹4499.00)
+- `certificateFee` (integer, default: 0) - **Amount in paise/cents**
 - `limit` (integer, default: 1000)
-- `startDate` (timestamp)
-- `endDate` (timestamp)
+- `startDate` (timestamp - ISO 8601 format)
+- `endDate` (timestamp - ISO 8601 format)
 - `status` (enum: "private", "live", "inProgress", "completed", default: "private")
 
 **Optional Fields:**
+- `priceInUsd` (integer) - **Amount in cents** (e.g., 5999 = $59.99)
 - `association` (string)
 - `banner` (string, URL)
 - `whatsAppGroupLink` (string, URL)
@@ -851,9 +1051,11 @@ curl -X POST http://localhost:3000/api/admin/courses \
 - `nextClassLink` (string, URL)
 - `nextClassDesc` (text)
 
+**Important:** All monetary values must be provided as integers in the smallest currency unit (paise for INR, cents for USD) to avoid floating-point precision issues.
+
 ---
 
-### 4. Update Course
+### 5. Update Course
 
 **Endpoint:** `PUT /api/admin/courses/:id`
 
@@ -899,7 +1101,7 @@ curl -X PUT http://localhost:3000/api/admin/courses/650e8400-e29b-41d4-a716-4466
 
 ---
 
-### 5. Delete Course
+### 6. Delete Course
 
 **Endpoint:** `DELETE /api/admin/courses/:id`
 
@@ -928,6 +1130,685 @@ curl -X DELETE http://localhost:3000/api/admin/courses/650e8400-e29b-41d4-a716-4
 
 ---
 
+## 📑 Course Content Sections API
+
+Base path: `/api/admin`
+
+### 1. Get All Sections for a Course
+
+**Endpoint:** `GET /api/admin/courses/:courseId/sections`
+
+**Description:** Retrieve all content sections for a specific course, ordered by their order field.
+
+**Parameters:**
+- `courseId` (path, required) - Course UUID
+
+**Request:**
+```bash
+curl http://localhost:3000/api/admin/courses/{courseId}/sections \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "section-uuid",
+      "courseId": "course-uuid",
+      "title": "Introduction to AI Fundamentals",
+      "order": 1,
+      "createdAt": "2024-12-01T10:00:00Z",
+      "updatedAt": "2024-12-01T10:00:00Z"
+    }
+  ],
+  "count": 1
+}
+```
+
+---
+
+### 2. Get Section by ID
+
+**Endpoint:** `GET /api/admin/sections/:id`
+
+**Parameters:**
+- `id` (path, required) - Section UUID
+
+**Request:**
+```bash
+curl http://localhost:3000/api/admin/sections/{sectionId} \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "id": "section-uuid",
+    "courseId": "course-uuid",
+    "title": "Introduction to AI Fundamentals",
+    "order": 1,
+    "createdAt": "2024-12-01T10:00:00Z",
+    "updatedAt": "2024-12-01T10:00:00Z"
+  }
+}
+```
+
+---
+
+### 3. Create Section
+
+**Endpoint:** `POST /api/admin/courses/:courseId/sections`
+
+**Parameters:**
+- `courseId` (path, required) - Course UUID
+
+**Request Body:**
+```json
+{
+  "title": "Getting Started",
+  "order": 1
+}
+```
+
+**Request:**
+```bash
+curl -X POST http://localhost:3000/api/admin/courses/{courseId}/sections \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -d '{
+    "title": "Getting Started",
+    "order": 1
+  }'
+```
+
+**Response:** `201 Created`
+```json
+{
+  "success": true,
+  "message": "Section created successfully",
+  "data": {
+    "id": "section-uuid",
+    "courseId": "course-uuid",
+    "title": "Getting Started",
+    "order": 1,
+    "createdAt": "2024-12-01T10:00:00Z",
+    "updatedAt": "2024-12-01T10:00:00Z"
+  }
+}
+```
+
+**Required Fields:**
+- `title` (string) - Section title
+- `order` (integer) - Display order
+
+---
+
+### 4. Update Section
+
+**Endpoint:** `PUT /api/admin/sections/:id`
+
+**Parameters:**
+- `id` (path, required) - Section UUID
+
+**Request Body:**
+```json
+{
+  "title": "Getting Started - Updated",
+  "order": 2
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "message": "Section updated successfully",
+  "data": {
+    "id": "section-uuid",
+    "title": "Getting Started - Updated",
+    "order": 2,
+    "updatedAt": "2024-12-01T12:00:00Z"
+  }
+}
+```
+
+---
+
+### 5. Delete Section
+
+**Endpoint:** `DELETE /api/admin/sections/:id`
+
+**Parameters:**
+- `id` (path, required) - Section UUID
+
+**Request:**
+```bash
+curl -X DELETE http://localhost:3000/api/admin/sections/{sectionId} \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "message": "Section deleted successfully",
+  "data": {
+    "id": "section-uuid",
+    "title": "Getting Started"
+  }
+}
+```
+
+---
+
+## 📝 Course Content API
+
+Base path: `/api/admin`
+
+### 1. Get All Content by Section
+
+**Endpoint:** `GET /api/admin/sections/:sectionId/content`
+
+**Description:** Retrieve all content items for a specific section, ordered by their order field.
+
+**Parameters:**
+- `sectionId` (path, required) - Section UUID
+
+**Request:**
+```bash
+curl http://localhost:3000/api/admin/sections/{sectionId}/content \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "content-uuid",
+      "courseId": "course-uuid",
+      "sectionId": "section-uuid",
+      "title": "Introduction to Python",
+      "desc": "Learn the basics of Python programming",
+      "type": "video",
+      "videoLink": "https://youtube.com/watch?v=xyz",
+      "order": 1,
+      "xp": 50,
+      "accessOn": 0,
+      "accessTill": 7,
+      "accessOnDate": "2024-12-01T00:00:00Z",
+      "accessTillDate": "2025-02-28T23:59:59Z",
+      "createdAt": "2024-12-01T10:00:00Z",
+      "updatedAt": "2024-12-01T10:00:00Z"
+    }
+  ],
+  "count": 1
+}
+```
+
+---
+
+### 2. Get All Content by Course
+
+**Endpoint:** `GET /api/admin/courses/:courseId/content`
+
+**Parameters:**
+- `courseId` (path, required) - Course UUID
+
+**Request:**
+```bash
+curl http://localhost:3000/api/admin/courses/{courseId}/content \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+---
+
+### 3. Get Content by ID
+
+**Endpoint:** `GET /api/admin/content/:id`
+
+**Parameters:**
+- `id` (path, required) - Content UUID
+
+**Request:**
+```bash
+curl http://localhost:3000/api/admin/content/{contentId} \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "id": "content-uuid",
+    "courseId": "course-uuid",
+    "sectionId": "section-uuid",
+    "title": "Introduction to Python",
+    "desc": "Learn the basics of Python programming",
+    "type": "video",
+    "videoLink": "https://youtube.com/watch?v=xyz",
+    "order": 1,
+    "xp": 50,
+    "accessOn": 0,
+    "accessTill": 7,
+    "accessOnDate": "2024-12-01T00:00:00Z",
+    "accessTillDate": "2025-02-28T23:59:59Z",
+    "createdAt": "2024-12-01T10:00:00Z",
+    "updatedAt": "2024-12-01T10:00:00Z"
+  }
+}
+```
+
+---
+
+### 4. Create Content
+
+**Endpoint:** `POST /api/admin/sections/:sectionId/content`
+
+**Parameters:**
+- `sectionId` (path, required) - Section UUID
+
+**Request Body:**
+```json
+{
+  "courseId": "course-uuid",
+  "title": "Introduction to Python",
+  "desc": "Learn the basics of Python programming",
+  "type": "video",
+  "videoLink": "https://youtube.com/watch?v=xyz",
+  "order": 1,
+  "xp": 50,
+  "accessOn": 0,
+  "accessTill": 7,
+  "accessOnDate": "2024-12-01T00:00:00.000Z",
+  "accessTillDate": "2025-02-28T23:59:59.000Z"
+}
+```
+
+**Request:**
+```bash
+curl -X POST http://localhost:3000/api/admin/sections/{sectionId}/content \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -d '{
+    "courseId": "course-uuid",
+    "title": "Introduction to Python",
+    "desc": "Learn the basics of Python programming",
+    "type": "video",
+    "videoLink": "https://youtube.com/watch?v=xyz",
+    "order": 1,
+    "xp": 50
+  }'
+```
+
+**Response:** `201 Created`
+```json
+{
+  "success": true,
+  "message": "Content created successfully",
+  "data": {
+    "id": "content-uuid",
+    "courseId": "course-uuid",
+    "sectionId": "section-uuid",
+    "title": "Introduction to Python",
+    "type": "video",
+    "order": 1,
+    "xp": 50,
+    "createdAt": "2024-12-01T10:00:00Z",
+    "updatedAt": "2024-12-01T10:00:00Z"
+  }
+}
+```
+
+**Required Fields:**
+- `courseId` (UUID) - Course identifier
+- `title` (string) - Content title
+- `type` (enum: "liveClass", "video", "assignment", "article") - Content type
+- `order` (integer) - Display order within section
+
+**Optional Fields:**
+- `desc` (text) - Content description (supports MDX/rich text)
+- `videoLink` (string) - URL for video or live class
+- `xp` (integer, default: 0) - Experience points awarded
+- `accessOn` (integer) - Access after N days
+- `accessTill` (integer) - Access until N days
+- `accessOnDate` (timestamp) - Specific access start date
+- `accessTillDate` (timestamp) - Specific access end date
+
+---
+
+### 5. Update Content
+
+**Endpoint:** `PUT /api/admin/content/:id`
+
+**Parameters:**
+- `id` (path, required) - Content UUID
+
+**Request Body:**
+```json
+{
+  "title": "Introduction to Python - Updated",
+  "xp": 100,
+  "order": 2
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "message": "Content updated successfully",
+  "data": {
+    "id": "content-uuid",
+    "title": "Introduction to Python - Updated",
+    "xp": 100,
+    "order": 2,
+    "updatedAt": "2024-12-01T12:00:00Z"
+  }
+}
+```
+
+---
+
+### 6. Delete Content
+
+**Endpoint:** `DELETE /api/admin/content/:id`
+
+**Parameters:**
+- `id` (path, required) - Content UUID
+
+**Request:**
+```bash
+curl -X DELETE http://localhost:3000/api/admin/content/{contentId} \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "message": "Content deleted successfully",
+  "data": {
+    "id": "content-uuid",
+    "title": "Introduction to Python"
+  }
+}
+```
+
+---
+
+## 🔄 Sort Order API
+
+Base path: `/api/admin`
+
+### Update Sort Order (Drag & Drop)
+
+**Endpoint:** `PUT /api/admin/sort-order`
+
+**Description:** Update the display order of sections or content items. Used for drag-and-drop reordering in the frontend.
+
+**Request Body:**
+```json
+{
+  "type": "section",
+  "sortedOrder": [
+    { "id": "section-uuid-1", "order": 1 },
+    { "id": "section-uuid-2", "order": 2 },
+    { "id": "section-uuid-3", "order": 3 }
+  ]
+}
+```
+
+**For Content Reordering:**
+```json
+{
+  "type": "content",
+  "sortedOrder": [
+    { "id": "content-uuid-1", "order": 1 },
+    { "id": "content-uuid-2", "order": 2 },
+    { "id": "content-uuid-3", "order": 3 }
+  ]
+}
+```
+
+**Request:**
+```bash
+curl -X PUT http://localhost:3000/api/admin/sort-order \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -d '{
+    "type": "section",
+    "sortedOrder": [
+      { "id": "section-uuid-1", "order": 1 },
+      { "id": "section-uuid-2", "order": 2 }
+    ]
+  }'
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "message": "section order updated successfully"
+}
+```
+
+**Required Fields:**
+- `type` (enum: "section", "content") - What to reorder
+- `sortedOrder` (array) - Array of objects with `id` and `order` fields
+
+**Use Case:**
+- Frontend implements drag-and-drop with a library like `react-beautiful-dnd`
+- After user reorders items, send the new order array to this endpoint
+- Backend updates all items' order values in a single request
+
+---
+
+## 📊 Course Progress API
+
+Base path: `/api/admin`
+
+### 1. Get Course Progress
+
+**Endpoint:** `GET /api/admin/enrollments/:enrollmentId/progress`
+
+**Description:** Retrieve course progress for a specific enrollment. Returns a nested structure: Sections → Content (with progress). Each section contains its content items ordered by their order field, with progress data if available. Course ID is automatically fetched from the enrollment.
+
+**Parameters:**
+- `enrollmentId` (path, required) - Enrollment UUID
+
+**Request:**
+```bash
+curl http://localhost:3000/api/admin/enrollments/{enrollmentId}/progress \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "section-uuid-1",
+      "title": "Introduction",
+      "order": 1,
+      "contents": [
+        {
+          "id": "content-uuid-1",
+          "title": "Intro to JS",
+          "order": 1,
+          "progress": {
+            "id": "progress-uuid-1",
+            "visited": 2,
+            "timeSpent": 1200,
+            "progress": 75,
+            "status": "inProgress",
+            "userStatus": "inProgress",
+            "attendedLive": false,
+            "createdAt": "2024-12-01T11:00:00Z",
+            "updatedAt": "2024-12-01T12:00:00Z"
+          }
+        },
+        {
+          "id": "content-uuid-2",
+          "title": "Loops and Conditionals",
+          "order": 2,
+          "progress": null
+        }
+      ]
+    },
+    {
+      "id": "section-uuid-2",
+      "title": "Advanced Topics",
+      "order": 2,
+      "contents": [
+        {
+          "id": "content-uuid-3",
+          "title": "Async/Await",
+          "order": 1,
+          "progress": {
+            "id": "progress-uuid-2",
+            "visited": 1,
+            "timeSpent": 600,
+            "progress": 50,
+            "status": "inProgress",
+            "userStatus": "inProgress",
+            "attendedLive": false,
+            "createdAt": "2024-12-01T13:00:00Z",
+            "updatedAt": "2024-12-01T14:00:00Z"
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Response Structure:**
+- Returns array of sections ordered by `order` field
+- Each section contains `contents` array ordered by `order` field
+- Each content includes minimal fields: `id`, `title`, `order`
+- Progress is `null` if content not started
+- Progress tracks: visited count, time spent (seconds), completion %, status, live attendance
+
+---
+
+### 2. Get Specific Content Progress
+
+**Endpoint:** `GET /api/admin/enrollments/:enrollmentId/content/:contentId/progress`
+
+**Description:** Get progress details for a specific content item.
+
+**Parameters:**
+- `enrollmentId` (path, required) - Enrollment UUID
+- `contentId` (path, required) - Content UUID
+
+**Request:**
+```bash
+curl http://localhost:3000/api/admin/enrollments/{enrollmentId}/content/{contentId}/progress \
+  -H "Authorization: Bearer <your-jwt-token>"
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "id": "progress-uuid",
+    "enrollmentId": "enrollment-uuid",
+    "courseContentId": "content-uuid",
+    "visited": 3,
+    "timeSpent": 1800,
+    "progress": 100,
+    "status": "completed",
+    "userStatus": "completed",
+    "attendedLive": true,
+    "createdAt": "2024-12-01T10:00:00Z",
+    "updatedAt": "2024-12-01T15:00:00Z"
+  }
+}
+```
+
+---
+
+### 3. Create or Update Progress
+
+**Endpoint:** `POST /api/admin/enrollments/:enrollmentId/content/:contentId/progress`
+
+**Description:** Create new progress record or update existing one for a content item. Automatically handles both create and update operations.
+
+**Parameters:**
+- `enrollmentId` (path, required) - Enrollment UUID
+- `contentId` (path, required) - Content UUID
+
+**Request Body:**
+```json
+{
+  "visited": 1,
+  "timeSpent": 600,
+  "progress": 50,
+  "status": "inProgress",
+  "userStatus": "inProgress",
+  "attendedLive": false
+}
+```
+
+**Request:**
+```bash
+curl -X POST http://localhost:3000/api/admin/enrollments/{enrollmentId}/content/{contentId}/progress \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -d '{
+    "visited": 1,
+    "timeSpent": 600,
+    "progress": 50,
+    "status": "inProgress"
+  }'
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "message": "Progress updated successfully",
+  "data": {
+    "id": "progress-uuid",
+    "enrollmentId": "enrollment-uuid",
+    "courseContentId": "content-uuid",
+    "visited": 1,
+    "timeSpent": 600,
+    "progress": 50,
+    "status": "inProgress",
+    "userStatus": "inProgress",
+    "attendedLive": false,
+    "createdAt": "2024-12-01T10:00:00Z",
+    "updatedAt": "2024-12-01T10:30:00Z"
+  }
+}
+```
+
+**Optional Fields:**
+- `visited` (integer) - Number of times content was visited
+- `timeSpent` (integer) - Time spent in seconds
+- `progress` (integer, 0-100) - Completion percentage
+- `status` (enum: "inProgress", "completed") - Content completion status
+- `userStatus` (enum: "inProgress", "completed") - User's status
+- `attendedLive` (boolean) - Whether user attended live class
+
+**Use Cases:**
+- Track when user opens a video/article
+- Update time spent on content
+- Mark content as completed
+- Track live class attendance
+
+---
+
 ## 🎓 Enrollments API
 
 Base path: `/api/admin/enrollments`
@@ -953,9 +1834,9 @@ curl http://localhost:3000/api/admin/enrollments \
       "id": "750e8400-e29b-41d4-a716-446655440002",
       "userId": "550e8400-e29b-41d4-a716-446655440000",
       "courseId": "650e8400-e29b-41d4-a716-446655440001",
-      "amountPaid": "4499.00",
+      "amountPaid": 449900,
       "paidAt": "2024-11-28T10:00:00Z",
-      "certificateFee": "500.00",
+      "certificateFee": 50000,
       "coupanCode": "SAVE10",
       "invoiceId": "INV-001",
       "transactionId": "TXN-12345",
@@ -971,6 +1852,7 @@ curl http://localhost:3000/api/admin/enrollments \
       "accessTillDate": "2025-02-28T23:59:59Z",
       "progress": 45,
       "timeSpent": 3600,
+      "xp": 350,
       "remark": "Good progress",
       "createdAt": "2024-11-28T10:00:00Z",
       "updatedAt": "2024-11-28T12:00:00Z"
@@ -1005,7 +1887,7 @@ curl http://localhost:3000/api/admin/enrollments/750e8400-e29b-41d4-a716-4466554
     "id": "750e8400-e29b-41d4-a716-446655440002",
     "userId": "550e8400-e29b-41d4-a716-446655440000",
     "courseId": "650e8400-e29b-41d4-a716-446655440001",
-    "amountPaid": "4499.00",
+    "amountPaid": 449900,
     "hasPaid": true,
     "status": "active",
     ...
@@ -1026,7 +1908,7 @@ curl http://localhost:3000/api/admin/enrollments/750e8400-e29b-41d4-a716-4466554
 {
   "userId": "550e8400-e29b-41d4-a716-446655440000",
   "courseId": "650e8400-e29b-41d4-a716-446655440001",
-  "amountPaid": "4499.00",
+  "amountPaid": 449900,
   "paidAt": "2024-11-28T10:00:00Z",
   "hasPaid": true,
   "status": "active"
@@ -1041,7 +1923,7 @@ curl -X POST http://localhost:3000/api/admin/enrollments \
   -d '{
     "userId": "550e8400-e29b-41d4-a716-446655440000",
     "courseId": "650e8400-e29b-41d4-a716-446655440001",
-    "amountPaid": "4499.00",
+    "amountPaid": 449900,
     "hasPaid": true,
     "status": "active"
   }'
@@ -1068,9 +1950,9 @@ curl -X POST http://localhost:3000/api/admin/enrollments \
 - `courseId` (UUID) - Foreign key to courses table
 
 **Optional Fields:**
-- `amountPaid` (numeric)
+- `amountPaid` (integer) - **Amount in paise/cents**
 - `paidAt` (timestamp)
-- `certificateFee` (numeric)
+- `certificateFee` (integer) - **Amount in paise/cents**
 - `coupanCode` (string)
 - `invoiceId` (string)
 - `transactionId` (string)
@@ -1086,6 +1968,7 @@ curl -X POST http://localhost:3000/api/admin/enrollments \
 - `accessTillDate` (timestamp)
 - `progress` (integer)
 - `timeSpent` (integer, in seconds)
+- `xp` (integer, default: 0) - Experience points earned in this course
 - `remark` (text)
 
 ---
@@ -1103,7 +1986,7 @@ curl -X POST http://localhost:3000/api/admin/enrollments \
 ```json
 {
   "hasPaid": true,
-  "amountPaid": "4499.00",
+  "amountPaid": 449900,
   "paidAt": "2024-11-28T10:00:00Z",
   "transactionId": "TXN-12345",
   "progress": 75
@@ -1241,7 +2124,7 @@ curl -X PUT http://localhost:3000/api/admin/enrollments/{enrollment-id} \
   -H "Content-Type: application/json" \
   -d '{
     "hasPaid": true,
-    "amountPaid": "4499.00",
+    "amountPaid": 449900,
     "paidAt": "2024-11-28T10:00:00Z",
     "transactionId": "TXN-12345",
     "paymentMethod": "razorpay"
@@ -1275,7 +2158,8 @@ curl -X PUT http://localhost:3000/api/admin/courses/{course-id} \
 
 - All timestamps should be in ISO 8601 format: `YYYY-MM-DDTHH:mm:ssZ`
 - All UUIDs are v4 format
-- Numeric fields (price, payable, etc.) should be strings with 2 decimal places
+- **All monetary values are stored as integers in paise/cents** (e.g., ₹4999.00 = 499900 paise, $59.99 = 5999 cents)
+- This avoids floating-point precision issues and is the industry standard for handling money
 - **Authentication is REQUIRED** - All endpoints need valid JWT token with admin role
 - CORS is configured for localhost:3000, localhost:5173, localhost:5174
 - User must exist in both Supabase Auth AND users table with admin role

@@ -45,6 +45,7 @@ import { api, ApiError } from "~/lib/api.client"
 import { queryKeys } from "~/lib/query-keys"
 import { useNavigate } from "react-router"
 import { useDebounce } from "~/hooks/use-debounce"
+import { UserEmailSearch } from "~/components/admin/users/user-email-search"
 
 // Define User Type
 export type User = {
@@ -294,6 +295,9 @@ export default function UsersPage() {
                         onChange={(event) => setSearchQuery(event.target.value)}
                         className="max-w-sm"
                     />
+                    <div className="ml-2">
+                        <UserEmailSearch />
+                    </div>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button variant="outline" className="ml-auto">

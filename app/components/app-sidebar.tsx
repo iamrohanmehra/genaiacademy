@@ -47,16 +47,6 @@ const data = {
       title: "Dashboard",
       url: "/admin/dashboard",
       icon: SquareTerminal,
-      items: [
-        {
-          title: "Overview",
-          url: "/admin/dashboard",
-        },
-        {
-          title: "Analytics",
-          url: "/admin/dashboard/analytics",
-        },
-      ],
     },
     {
       title: "Courses",

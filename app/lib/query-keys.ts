@@ -9,5 +9,6 @@ export const queryKeys = {
         all: ['users'] as const,
         list: (page: number, query: string) => ['users', page, query] as const,
         detail: (id: string) => ['user', id] as const,
+        searchByEmail: (email: string) => ['users', 'search', 'email', email] as const,
     },
 } as const;
