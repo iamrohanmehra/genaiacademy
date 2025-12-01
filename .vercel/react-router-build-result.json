@@ -18,9 +18,9 @@
       "routes/admin/users-details": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/courses": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/courses/create": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/admin/courses-details": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/courses/edit": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/course-content": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/debug-token": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/student/dashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
     },
     "routes": {
@@ -108,15 +108,6 @@
           "runtime": "nodejs"
         }
       },
-      "routes/admin/courses-details": {
-        "id": "routes/admin/courses-details",
-        "parentId": "routes/admin/layout",
-        "file": "app/routes/admin/courses-details.tsx",
-        "path": "admin/courses/:id",
-        "config": {
-          "runtime": "nodejs"
-        }
-      },
       "routes/admin/courses/edit": {
         "id": "routes/admin/courses/edit",
         "parentId": "routes/admin/layout",
@@ -131,6 +122,15 @@
         "parentId": "routes/admin/layout",
         "file": "app/routes/admin/course-content.tsx",
         "path": "admin/courses/:id/content",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/debug-token": {
+        "id": "routes/debug-token",
+        "parentId": "root",
+        "file": "app/routes/debug-token.tsx",
+        "path": "debug-token",
         "config": {
           "runtime": "nodejs"
         }
@@ -216,12 +216,6 @@
         "file": "routes/admin/courses/create.tsx",
         "path": "admin/courses/create"
       },
-      "routes/admin/courses-details": {
-        "id": "routes/admin/courses-details",
-        "parentId": "routes/admin/layout",
-        "file": "routes/admin/courses-details.tsx",
-        "path": "admin/courses/:id"
-      },
       "routes/admin/courses/edit": {
         "id": "routes/admin/courses/edit",
         "parentId": "routes/admin/layout",
@@ -233,6 +227,12 @@
         "parentId": "routes/admin/layout",
         "file": "routes/admin/course-content.tsx",
         "path": "admin/courses/:id/content"
+      },
+      "routes/debug-token": {
+        "id": "routes/debug-token",
+        "parentId": "root",
+        "file": "routes/debug-token.tsx",
+        "path": "debug-token"
       },
       "routes/student/dashboard": {
         "id": "routes/student/dashboard",
@@ -290,10 +290,6 @@
                 "path": "admin/courses/create"
               },
               {
-                "file": "routes/admin/courses-details.tsx",
-                "path": "admin/courses/:id"
-              },
-              {
                 "file": "routes/admin/courses/edit.tsx",
                 "path": "admin/courses/:id/edit"
               },
@@ -302,6 +298,10 @@
                 "path": "admin/courses/:id/content"
               }
             ]
+          },
+          {
+            "file": "routes/debug-token.tsx",
+            "path": "debug-token"
           },
           {
             "file": "routes/student/dashboard.tsx",

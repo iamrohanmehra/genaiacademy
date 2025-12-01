@@ -49,6 +49,7 @@ import {
     PopoverTrigger,
 } from "~/components/ui/popover"
 // import { Calendar } from "~/components/ui/calendar"
+import { TiptapEditor } from "~/components/tiptap-editor"
 import React from "react"
 const Calendar = React.lazy(() => import("~/components/ui/calendar").then(module => ({ default: module.Calendar })))
 import { api, ApiError } from "~/lib/api.client"
@@ -583,17 +584,12 @@ export default function CourseContentPage() {
 
                                         <div className="space-y-2">
                                             <Label>Content (Rich Text)</Label>
-                                            <Textarea
+                                            <TiptapEditor
                                                 value={selectedChapter.content}
-                                                onChange={(e) =>
-                                                    handleUpdateChapter("content", e.target.value)
+                                                onChange={(value) =>
+                                                    handleUpdateChapter("content", value)
                                                 }
-                                                className="min-h-[200px] font-mono"
-                                                placeholder="# Markdown supported..."
                                             />
-                                            <p className="text-xs text-muted-foreground">
-                                                Supports Markdown formatting.
-                                            </p>
                                         </div>
 
                                         <div className="grid gap-6 md:grid-cols-2">

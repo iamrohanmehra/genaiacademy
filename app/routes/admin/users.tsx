@@ -182,7 +182,7 @@ const MemoizedTableRow = React.memo(({ row }: { row: any }) => {
     return (
         <TableRow
             data-state={row.getIsSelected() && "selected"}
-            className={row.original.status === 'banned' ? 'bg-linear-to-t from-[#ffb86a] to-background hover:from-[#ffb86a]/90 hover:to-background/90' : ''}
+            className={row.original.status === 'banned' ? 'bg-orange-300 hover:bg-orange-300/90' : ''}
         >
             {row.getVisibleCells().map((cell: any) => (
                 <TableCell key={cell.id}>

@@ -92,8 +92,17 @@ const CourseActions = React.memo(({ course }: { course: Course }) => {
                     Copy Course ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>View details</DropdownMenuItem>
-                <DropdownMenuItem>Edit course</DropdownMenuItem>
+
+                <DropdownMenuItem asChild>
+                    <Link to={`/admin/courses/${course.id}/content`}>
+                        Manage Content
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                    <Link to={`/admin/courses/${course.id}/edit`}>
+                        Edit course
+                    </Link>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
@@ -167,7 +176,7 @@ export const columns: ColumnDef<Course>[] = [
         },
         cell: ({ row }) => (
             <Link
-                to={`/admin/courses/${row.original.id}`}
+                to={`/admin/courses/${row.original.id}/edit`}
                 className="hover:underline font-medium text-primary"
             >
                 {row.getValue("title")}
