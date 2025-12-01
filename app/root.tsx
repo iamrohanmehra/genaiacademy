@@ -32,10 +32,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "~/lib/query-client";
+import { supabase } from "~/lib/supabase";
 
 export default function App() {
+  useEffect(() => {
+    const checkSession = async () => {
+      const { error } = await supabase.auth.getUser();
+      if (error && (error.status === 403 || error.message.includes("invalid JWT"))) {
+        console.warn("Detected invalid session, signing out...");
+        await supabase.auth.signOut();
+        window.location.href = "/login";
+      }
+    };
+    checkSession();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
