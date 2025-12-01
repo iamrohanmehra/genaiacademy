@@ -42,7 +42,9 @@ import {
 
 import { supabase } from "~/lib/supabase"
 import { api, ApiError } from "~/lib/api.client"
+import { queryKeys } from "~/lib/query-keys"
 import { useNavigate } from "react-router"
+import { useDebounce } from "~/hooks/use-debounce"
 
 // Define User Type
 export type User = {
@@ -55,6 +57,31 @@ export type User = {
     createdAt: string
     lastActivity: string | null
 }
+
+const UserActions = React.memo(({ user }: { user: User }) => {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                    onClick={() => navigator.clipboard.writeText(user.id)}
+                >
+                    Copy User ID
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>View details</DropdownMenuItem>
+                <DropdownMenuItem>Edit user</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+})
+UserActions.displayName = "UserActions"
 
 export const columns: ColumnDef<User>[] = [
     {
@@ -147,33 +174,28 @@ export const columns: ColumnDef<User>[] = [
     {
         id: "actions",
         enableHiding: false,
-        cell: ({ row }) => {
-            const user = row.original
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(user.id)}
-                        >
-                            Copy User ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>View details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit user</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
-        },
+        cell: ({ row }) => <UserActions user={row.original} />,
     },
 ]
+
+const MemoizedTableRow = React.memo(({ row }: { row: any }) => {
+    return (
+        <TableRow
+            data-state={row.getIsSelected() && "selected"}
+            className={row.original.status === 'banned' ? 'bg-linear-to-t from-[#ffb86a] to-background hover:from-[#ffb86a]/90 hover:to-background/90' : ''}
+        >
+            {row.getVisibleCells().map((cell: any) => (
+                <TableCell key={cell.id}>
+                    {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                    )}
+                </TableCell>
+            ))}
+        </TableRow>
+    )
+})
+MemoizedTableRow.displayName = "MemoizedTableRow"
 
 export default function UsersPage() {
     const navigate = useNavigate()
@@ -184,22 +206,16 @@ export default function UsersPage() {
 
     const [page, setPage] = React.useState(1)
     const [searchQuery, setSearchQuery] = React.useState("")
-    const [debouncedQuery, setDebouncedQuery] = React.useState("")
+    const debouncedSearch = useDebounce(searchQuery, 300)
     const limit = 100
 
-    // Debounce search query
+    // Reset to page 1 if search query changes
     React.useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedQuery(searchQuery)
-            if (searchQuery !== debouncedQuery) {
-                setPage(1) // Reset to page 1 only if query changed
-            }
-        }, 500)
-        return () => clearTimeout(handler)
-    }, [searchQuery])
+        setPage(1)
+    }, [debouncedSearch])
 
     const { data: queryData, isLoading, isError, error } = useQuery({
-        queryKey: ['users', page, debouncedQuery],
+        queryKey: queryKeys.users.list(page, debouncedSearch),
         queryFn: async () => {
             const { data: { session } } = await supabase.auth.getSession()
             const token = session?.access_token
@@ -208,14 +224,11 @@ export default function UsersPage() {
                 throw new ApiError("Unauthorized", 401)
             }
 
-            const offset = (page - 1) * limit
-            let endpoint = `/api/admin/users?limit=${limit}&offset=${offset}`
-
-            if (debouncedQuery) {
-                endpoint = `/api/admin/users/search?q=${encodeURIComponent(debouncedQuery)}`
-            }
-
-            return api.get<{ data: User[], count: number }>(endpoint, token)
+            const result = await api.get<{ success: boolean; data: User[]; count: number }>(
+                `/api/admin/users?page=${page}&limit=${limit}&search=${debouncedSearch}`,
+                token
+            )
+            return result
         },
         placeholderData: keepPreviousData,
         retry: (failureCount, error) => {
@@ -223,7 +236,8 @@ export default function UsersPage() {
                 return false
             }
             return failureCount < 3
-        }
+        },
+        refetchOnMount: true,
     })
 
     React.useEffect(() => {
@@ -237,8 +251,8 @@ export default function UsersPage() {
         }
     }, [isError, error, navigate])
 
-    const data = React.useMemo(() => queryData?.data || [], [queryData])
-    const totalCount = React.useMemo(() => queryData?.count || queryData?.data?.length || 0, [queryData])
+    const data = queryData?.data || []
+    const totalCount = queryData?.count || 0
     const loading = isLoading
 
     const table = useReactTable({
@@ -331,35 +345,19 @@ export default function UsersPage() {
                             {loading ? (
                                 <TableRow>
                                     <TableCell colSpan={columns.length} className="h-24 text-center">
-                                        <div className="flex items-center justify-center gap-2">
-                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                        <div className="flex justify-center items-center">
+                                            <Loader2 className="h-6 w-6 animate-spin mr-2" />
                                             Loading...
                                         </div>
                                     </TableCell>
                                 </TableRow>
                             ) : table.getRowModel().rows?.length ? (
                                 table.getRowModel().rows.map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
-                                        className={row.original.status === 'banned' ? 'bg-linear-to-t from-[#ffb86a] to-background hover:from-[#ffb86a]/90 hover:to-background/90' : ''}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
+                                    <MemoizedTableRow key={row.id} row={row} />
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        className="h-24 text-center"
-                                    >
+                                    <TableCell colSpan={columns.length} className="h-24 text-center">
                                         No results.
                                     </TableCell>
                                 </TableRow>
@@ -372,7 +370,7 @@ export default function UsersPage() {
                         {table.getFilteredSelectedRowModel().rows.length} of{" "}
                         {table.getFilteredRowModel().rows.length} row(s) selected.
                     </div>
-                    <div className="space-x-2">
+                    <div className="space-x-2 flex items-center">
                         <Button
                             variant="outline"
                             size="sm"

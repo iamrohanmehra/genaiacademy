@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useQuery } from "@tanstack/react-query"
 import {
   BookOpen,
   Bot,
@@ -11,6 +12,7 @@ import {
   SquareTerminal,
 } from "lucide-react"
 
+import { queryKeys } from "~/lib/query-keys"
 import { NavMain } from "~/components/nav-main"
 import { NavProjects } from "~/components/nav-projects"
 import { NavUser } from "~/components/nav-user"
@@ -129,21 +131,24 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [user, setUser] = React.useState(data.user)
-
-  React.useEffect(() => {
-    const getUser = async () => {
+  const { data: userData } = useQuery({
+    queryKey: queryKeys.session,
+    queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
-        setUser({
+        return {
           name: session.user.user_metadata.full_name || session.user.email?.split('@')[0] || "User",
           email: session.user.email || "",
           avatar: session.user.user_metadata.avatar_url || "https://github.com/shadcn.png",
-        })
+        }
       }
-    }
-    getUser()
-  }, [])
+      return data.user
+    },
+    initialData: data.user,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+
+  const user = userData
 
   return (
     <Sidebar collapsible="icon" {...props}>

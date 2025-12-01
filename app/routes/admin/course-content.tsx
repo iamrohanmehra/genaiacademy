@@ -49,6 +49,8 @@ import {
     PopoverTrigger,
 } from "~/components/ui/popover"
 import { Calendar } from "~/components/ui/calendar"
+import { api, ApiError } from "~/lib/api.client"
+import { queryKeys } from "~/lib/query-keys"
 import { cn } from "~/lib/utils"
 
 import { Label } from "~/components/ui/label"
@@ -238,7 +240,7 @@ export default function CourseContentPage() {
     const [sections, setSections] = useState<Section[]>([])
 
     const { data: queryData, isLoading } = useQuery({
-        queryKey: ['course-content', id],
+        queryKey: queryKeys.courses.content(id || ''),
         queryFn: async () => {
             // Simulate API call or fetch real data if endpoint exists
             // For now returning mock data to maintain functionality

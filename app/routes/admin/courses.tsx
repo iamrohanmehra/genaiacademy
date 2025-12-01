@@ -14,7 +14,8 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import { useQuery, keepPreviousData } from "@tanstack/react-query"
+import { useQuery, keepPreviousData, useQueryClient } from "@tanstack/react-query"
+import { useVirtualizer } from "@tanstack/react-virtual"
 import { ArrowUpDown, ChevronDown, MoreHorizontal, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
@@ -44,7 +45,9 @@ import { SiteHeader } from "~/components/site-header"
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar"
 import { supabase } from "~/lib/supabase"
 import { api, ApiError } from "~/lib/api.client"
+import { queryKeys } from "~/lib/query-keys"
 import { Badge } from "~/components/ui/badge"
+import { useDebounce } from "~/hooks/use-debounce"
 
 // Define Course Type
 export type Course = {
@@ -70,6 +73,60 @@ export type Course = {
     status: "live" | "private" | "completed"
     createdAt: string
     updatedAt: string
+}
+
+const CourseActions = React.memo(({ course }: { course: Course }) => {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                    onClick={() => navigator.clipboard.writeText(course.id)}
+                >
+                    Copy Course ID
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>View details</DropdownMenuItem>
+                <DropdownMenuItem>Edit course</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+})
+CourseActions.displayName = "CourseActions"
+
+function DebouncedInput({
+    value: initialValue,
+    onChange,
+    debounce = 300,
+    ...props
+}: {
+    value: string | number
+    onChange: (value: string | number) => void
+    debounce?: number
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
+    const [value, setValue] = React.useState(initialValue)
+
+    React.useEffect(() => {
+        setValue(initialValue)
+    }, [initialValue])
+
+    React.useEffect(() => {
+        const timeout = setTimeout(() => {
+            onChange(value)
+        }, debounce)
+
+        return () => clearTimeout(timeout)
+    }, [value])
+
+    return (
+        <Input {...props} value={value} onChange={(e) => setValue(e.target.value)} />
+    )
 }
 
 export const columns: ColumnDef<Course>[] = [
@@ -162,33 +219,45 @@ export const columns: ColumnDef<Course>[] = [
     {
         id: "actions",
         enableHiding: false,
-        cell: ({ row }) => {
-            const course = row.original
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(course.id)}
-                        >
-                            Copy Course ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>View details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit course</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
-        },
+        cell: ({ row }) => <CourseActions course={row.original} />,
     },
 ]
+
+const MemoizedTableRow = React.memo(({ row, queryClient }: { row: any, queryClient: any }) => {
+    const course = row.original
+
+    const prefetchCourse = async () => {
+        const { data: { session } } = await supabase.auth.getSession()
+        const token = session?.access_token
+        if (!token) return
+
+        queryClient.prefetchQuery({
+            queryKey: queryKeys.courses.detail(course.id),
+            queryFn: async () => {
+                const result = await api.get<{ success: boolean; data: Course }>(`/api/admin/courses/${course.id}`, token)
+                return result.data
+            },
+            staleTime: 1000 * 60 * 5, // 5 minutes
+        })
+    }
+
+    return (
+        <TableRow
+            data-state={row.getIsSelected() && "selected"}
+            onMouseEnter={prefetchCourse}
+        >
+            {row.getVisibleCells().map((cell: any) => (
+                <TableCell key={cell.id}>
+                    {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                    )}
+                </TableCell>
+            ))}
+        </TableRow>
+    )
+})
+MemoizedTableRow.displayName = "MemoizedTableRow"
 
 export default function CoursesPage() {
     const [sorting, setSorting] = React.useState<SortingState>([])
@@ -197,7 +266,7 @@ export default function CoursesPage() {
     const [rowSelection, setRowSelection] = React.useState({})
 
     const { data: queryData, isLoading, isError } = useQuery({
-        queryKey: ['courses'],
+        queryKey: queryKeys.courses.all,
         queryFn: async () => {
             const { data: { session } } = await supabase.auth.getSession()
             const token = session?.access_token
@@ -212,6 +281,7 @@ export default function CoursesPage() {
         placeholderData: keepPreviousData,
     })
 
+    const queryClient = useQueryClient()
     const data = React.useMemo(() => queryData?.data || [], [queryData])
     const loading = isLoading
 
@@ -234,9 +304,24 @@ export default function CoursesPage() {
         },
     })
 
+    const { rows } = table.getRowModel()
+    const parentRef = React.useRef<HTMLDivElement>(null)
+
+    const virtualizer = useVirtualizer({
+        count: rows.length,
+        getScrollElement: () => parentRef.current,
+        estimateSize: () => 60, // Estimated row height
+        overscan: 10,
+    })
+
+    const virtualRows = virtualizer.getVirtualItems()
+    const totalSize = virtualizer.getTotalSize()
+    const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0
+    const paddingBottom = virtualRows.length > 0 ? totalSize - (virtualRows[virtualRows.length - 1].end || 0) : 0
+
     return (
 
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0" >
             <div className="flex items-center justify-between space-y-2 py-4">
                 <h2 className="text-lg font-semibold">All Courses</h2>
                 <Button asChild>
@@ -246,11 +331,11 @@ export default function CoursesPage() {
 
             <div className="w-full">
                 <div className="flex items-center py-4">
-                    <Input
+                    <DebouncedInput
                         placeholder="Filter courses..."
                         value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-                        onChange={(event) =>
-                            table.getColumn("title")?.setFilterValue(event.target.value)
+                        onChange={(value) =>
+                            table.getColumn("title")?.setFilterValue(value)
                         }
                         className="max-w-sm"
                     />
@@ -281,9 +366,12 @@ export default function CoursesPage() {
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-                <div className="rounded-md border">
+                <div
+                    ref={parentRef}
+                    className="rounded-md border h-[600px] overflow-auto relative"
+                >
                     <Table>
-                        <TableHeader>
+                        <TableHeader className="sticky top-0 bg-background z-10 shadow-sm">
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <TableRow key={headerGroup.id}>
                                     {headerGroup.headers.map((header) => {
@@ -312,21 +400,24 @@ export default function CoursesPage() {
                                     </TableCell>
                                 </TableRow>
                             ) : table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
+                                <>
+                                    {paddingTop > 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={columns.length} style={{ height: `${paddingTop}px` }} />
+                                        </TableRow>
+                                    )}
+                                    {virtualRows.map((virtualRow) => {
+                                        const row = rows[virtualRow.index]
+                                        return (
+                                            <MemoizedTableRow key={row.id} row={row} queryClient={queryClient} />
+                                        )
+                                    })}
+                                    {paddingBottom > 0 && (
+                                        <TableRow>
+                                            <TableCell colSpan={columns.length} style={{ height: `${paddingBottom}px` }} />
+                                        </TableRow>
+                                    )}
+                                </>
                             ) : (
                                 <TableRow>
                                     <TableCell
@@ -365,6 +456,6 @@ export default function CoursesPage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }

@@ -34,7 +34,9 @@ This is a **STRICTLY FRONTEND** repository.
 ### State Management (React Query)
 - Use `useQuery` for fetching data.
 - Use `useMutation` for modifying data (POST, PUT, DELETE).
-- **CRITICAL**: Always invalidate relevant query keys (e.g., `queryClient.invalidateQueries({ queryKey: ['users'] })`) after a successful mutation to ensure UI consistency.
+- **Query Keys**: **ALWAYS** use the centralized `queryKeys` factory from `app/lib/query-keys.ts`. Do not hardcode query key strings.
+- **Invalidation**: Always invalidate relevant query keys (e.g., `queryClient.invalidateQueries({ queryKey: queryKeys.users.all })`) after a successful mutation.
+- **Stale Data**: Use `refetchOnMount: true` for lists that need to reflect immediate changes after navigation (e.g., returning from a detail page after an edit).
 
 ### Navigation & Routing
 - Use `<Link>` from `react-router` for all internal navigation. **NEVER** use `<a>` tags for internal links as they cause full page reloads.
@@ -56,12 +58,20 @@ This is a **STRICTLY FRONTEND** repository.
 - **Security**: Do not use Supabase Admin SDK or service keys in this repo. Client-side keys (`ANON_KEY`) only.
 - **Environment Variables**: Use `import.meta.env.VITE_*` for client-side variables. **NEVER** expose `SUPABASE_SERVICE_ROLE_KEY` to the client.
 
-## 4. Vercel Deployment Optimization
+## 4. Performance Optimization
+- **Virtualization**: Use `@tanstack/react-virtual` for long lists (e.g., Users table, Courses table) to ensure high performance.
+- **Lazy Loading**: Use `React.lazy` and `Suspense` for heavy UI components (e.g., `Calendar`, complex Dialogs) that are not immediately visible.
+- **Image Optimization**: **ALWAYS** use the `OptimizedImage` component (`app/components/optimized-image.tsx`) for images. Ensure `loading="lazy"` and `decoding="async"` are used.
+- **Debouncing**: Use `useDebounce` hook (`app/hooks/use-debounce.ts`) for search inputs and filters to prevent excessive API calls.
+- **Memoization**: Use `React.memo`, `useMemo`, and `useCallback` appropriately to prevent unnecessary re-renders, especially in lists and tables.
+- **Prefetching**: Implement prefetching on hover (e.g., `onMouseEnter`) for critical navigation links to improve perceived speed.
+
+## 5. Vercel Deployment Optimization
 - Ensure `vite.config.ts` and `react-router.config.ts` are optimized for Vercel.
 - Do not include heavy server-side dependencies that bloat the client bundle.
 - Respect the `build` script: `bun run build` (aliased to `react-router build`).
 
-## 5. Agent Behavior
+## 6. Agent Behavior
 - **Proactive Fixes**: If you see unused imports or type errors in files you are editing, fix them.
 - **Verification**: After implementing a feature, verify it doesn't break the build (`bun run build`) or typecheck (`bun run typecheck`).
 - **Conciseness**: Write clean, readable code. Avoid over-engineering.

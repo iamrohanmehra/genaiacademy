@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState, Suspense, lazy } from "react"
 import { useNavigate, Link } from "react-router"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -11,7 +11,7 @@ import { toast } from "sonner"
 
 import { cn } from "~/lib/utils"
 import { Button } from "~/components/ui/button"
-import { Calendar } from "~/components/ui/calendar"
+// import { Calendar } from "~/components/ui/calendar"
 import {
     Form,
     FormControl,
@@ -39,8 +39,11 @@ import { AppSidebar } from "~/components/app-sidebar"
 import { SiteHeader } from "~/components/site-header"
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar"
 import { supabase } from "~/lib/supabase"
-import { api } from "~/lib/api.client"
+import { api, ApiError } from "~/lib/api.client"
+import { queryKeys } from "~/lib/query-keys"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card"
+
+const Calendar = lazy(() => import("~/components/ui/calendar").then(module => ({ default: module.Calendar })))
 
 const formSchema = z.object({
     title: z.string().min(2, "Title must be at least 2 characters."),
@@ -353,15 +356,17 @@ export default function CreateCoursePage() {
                                                         </FormControl>
                                                     </PopoverTrigger>
                                                     <PopoverContent className="w-auto p-0" align="start">
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={field.value}
-                                                            onSelect={field.onChange}
-                                                            disabled={(date) =>
-                                                                date < new Date("1900-01-01")
-                                                            }
-                                                            initialFocus
-                                                        />
+                                                        <Suspense fallback={<div className="p-4 flex justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={field.value}
+                                                                onSelect={field.onChange}
+                                                                disabled={(date) =>
+                                                                    date < new Date("1900-01-01")
+                                                                }
+                                                                initialFocus
+                                                            />
+                                                        </Suspense>
                                                     </PopoverContent>
                                                 </Popover>
                                                 <FormMessage />

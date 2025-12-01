@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense, lazy } from "react"
 import { useNavigate, Link, useParams } from "react-router"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -8,11 +8,11 @@ import { z } from "zod"
 import { format } from "date-fns"
 import { CalendarIcon, Loader2, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { cn } from "~/lib/utils"
 import { Button } from "~/components/ui/button"
-import { Calendar } from "~/components/ui/calendar"
+// import { Calendar } from "~/components/ui/calendar"
 import {
     Form,
     FormControl,
@@ -38,7 +38,10 @@ import {
 } from "~/components/ui/popover"
 import { supabase } from "~/lib/supabase"
 import { api, ApiError } from "~/lib/api.client"
+import { queryKeys } from "~/lib/query-keys"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card"
+
+const Calendar = lazy(() => import("~/components/ui/calendar").then(module => ({ default: module.Calendar })))
 
 // Reuse schema from create page
 const formSchema = z.object({
@@ -91,8 +94,8 @@ type Course = {
 export default function EditCoursePage() {
     const { id } = useParams()
     const navigate = useNavigate()
-    const [submitting, setSubmitting] = useState(false)
 
+    const queryClient = useQueryClient()
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -118,7 +121,7 @@ export default function EditCoursePage() {
 
     // Fetch course details
     const { data: course, isLoading } = useQuery({
-        queryKey: ['course', id],
+        queryKey: queryKeys.courses.detail(id || ''),
         queryFn: async () => {
             if (!id) throw new Error("No course ID")
             const { data: { session } } = await supabase.auth.getSession()
@@ -145,6 +148,7 @@ export default function EditCoursePage() {
                 topic: course.topic,
                 price: parseFloat(course.price),
                 payable: parseFloat(course.payable),
+
                 certificateFee: parseFloat(course.certificateFee),
                 limit: course.limit,
                 startDate: new Date(course.startDate),
@@ -161,18 +165,12 @@ export default function EditCoursePage() {
         }
     }, [course, form])
 
-    async function onSubmit(values: z.infer<typeof formSchema>) {
-        setSubmitting(true)
-        try {
+    const { mutate: updateCourse, isPending: submitting } = useMutation({
+        mutationFn: async (values: z.infer<typeof formSchema>) => {
             const { data: { session } } = await supabase.auth.getSession()
             const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
 
-            if (!token) {
-                toast.error("Unauthorized")
-                return
-            }
-
-            // Format dates to ISO string for API
             const rawPayload = {
                 ...values,
                 price: values.price.toFixed(2),
@@ -182,22 +180,57 @@ export default function EditCoursePage() {
                 endDate: values.endDate.toISOString(),
             }
 
-            // Remove empty strings to avoid overwriting with empty values if that's not intended
-            // But for edit, we might want to clear values. The API docs say "Only provide fields you want to update".
-            // Sending everything is safer to ensure state matches form.
-
             const result = await api.put<{ success: boolean; message: string; data: Course }>(`/api/admin/courses/${id}`, rawPayload, token)
+            return result
+        },
+        onMutate: async (newCourseData) => {
+            await queryClient.cancelQueries({ queryKey: queryKeys.courses.detail(id || '') })
+            const previousCourse = queryClient.getQueryData<Course>(queryKeys.courses.detail(id || ''))
 
-            if (result.success) {
+            if (previousCourse) {
+                // Optimistically update
+                // Note: We need to be careful with types here. The form data structure is slightly different from the Course type (e.g. dates are Date objects vs strings).
+                // For a true optimistic update, we'd need to convert form values to match the Course type perfectly.
+                // Given the complexity of date conversions and potential partial updates, we'll do a "best effort" optimistic update
+                // or simply rely on the loading state if the transformation is too complex to replicate client-side reliably without duplication.
+
+                // However, for this requirement, let's implement the optimistic update by merging compatible fields.
+                queryClient.setQueryData(queryKeys.courses.detail(id || ''), {
+                    ...previousCourse,
+                    ...newCourseData,
+                    // Convert dates to strings to match Course type if needed for display immediately, 
+                    // though the UI might be using Date objects if we parsed them in the component.
+                    // Actually, the component parses strings to Dates in useEffect.
+                    // So we should be careful. 
+                    // The safest bet for now is to rely on invalidation for the full refresh, 
+                    // BUT since we want optimistic updates, let's try to update the simple fields.
+                    title: newCourseData.title,
+                    desc: newCourseData.desc,
+                    price: newCourseData.price.toFixed(2),
+                    payable: newCourseData.payable.toFixed(2),
+                })
+            }
+
+            return { previousCourse }
+        },
+        onError: (err, newCourseData, context) => {
+            if (context?.previousCourse) {
+                queryClient.setQueryData(queryKeys.courses.detail(id || ''), context.previousCourse)
+            }
+            toast.error(err instanceof Error ? err.message : "Failed to update course")
+        },
+        onSettled: (data) => {
+            if (data?.success) {
                 toast.success("Course updated successfully")
                 navigate(`/admin/courses/${id}`)
             }
-        } catch (error) {
-            console.error(error)
-            toast.error(error instanceof Error ? error.message : "Failed to update course")
-        } finally {
-            setSubmitting(false)
-        }
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.detail(id || '') })
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.all })
+        },
+    })
+
+    function onSubmit(values: z.infer<typeof formSchema>) {
+        updateCourse(values)
     }
 
     if (isLoading) {
@@ -400,15 +433,17 @@ export default function EditCoursePage() {
                                                         </FormControl>
                                                     </PopoverTrigger>
                                                     <PopoverContent className="w-auto p-0" align="start">
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={field.value}
-                                                            onSelect={field.onChange}
-                                                            disabled={(date) =>
-                                                                date < new Date("1900-01-01")
-                                                            }
-                                                            initialFocus
-                                                        />
+                                                        <Suspense fallback={<div className="p-4 flex justify-center"><Loader2 className="h-6 w-6 animate-spin" /></div>}>
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={field.value}
+                                                                onSelect={field.onChange}
+                                                                disabled={(date) =>
+                                                                    date < new Date("1900-01-01")
+                                                                }
+                                                                initialFocus
+                                                            />
+                                                        </Suspense>
                                                     </PopoverContent>
                                                 </Popover>
                                                 <FormMessage />

@@ -18,7 +18,7 @@ import {
     Key,
     Trash2
 } from "lucide-react"
-import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card"
@@ -66,6 +66,7 @@ import { SiteHeader } from "~/components/site-header"
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar"
 import { supabase } from "~/lib/supabase"
 import { api, ApiError } from "~/lib/api.client"
+import { queryKeys } from "~/lib/query-keys"
 
 type Enrollment = {
     courseId: string
@@ -298,7 +299,7 @@ function DeleteUserDialog({ user, open, onOpenChange }: { user: UserDetails, ope
             const result = await api.delete<{ success: boolean }>(`/api/admin/users/${user.id}`, token)
             if (result.success) {
                 toast.success("User deleted successfully")
-                await queryClient.invalidateQueries({ queryKey: ['users'] })
+                await queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
                 navigate("/admin/users")
             }
         } catch (error) {
@@ -509,11 +510,11 @@ function ProfileContent({ user }: { user: UserDetails }) {
 export default function UserDetailsPage() {
     const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
-    const [actionLoading, setActionLoading] = useState(false)
+
     const queryClient = useQueryClient()
 
     const { data: user, isLoading: loading } = useQuery({
-        queryKey: ['user', id],
+        queryKey: queryKeys.users.detail(id || ''),
         queryFn: async () => {
             if (!id) throw new Error("No user ID")
             const { data: { session } } = await supabase.auth.getSession()
@@ -529,31 +530,44 @@ export default function UserDetailsPage() {
         enabled: !!id,
     })
 
-    const handleStatusChange = async (newStatus: 'active' | 'banned') => {
-        if (!id || !user) return
-
-        try {
-            setActionLoading(true)
+    const { mutate: toggleStatus, isPending: actionLoading } = useMutation({
+        mutationFn: async (newStatus: 'active' | 'banned') => {
+            if (!id) throw new Error("No user ID")
             const { data: { session } } = await supabase.auth.getSession()
             const token = session?.access_token
-
-            if (!token) return
+            if (!token) throw new ApiError("Unauthorized", 401)
 
             const endpoint = newStatus === 'banned' ? 'ban' : 'activate'
             const result = await api.post<{ success: boolean }>(`/api/admin/users/${id}/${endpoint}`, {}, token)
+            return result
+        },
+        onMutate: async (newStatus) => {
+            await queryClient.cancelQueries({ queryKey: queryKeys.users.detail(id || '') })
+            const previousUser = queryClient.getQueryData<UserDetails>(queryKeys.users.detail(id || ''))
 
-            if (result.success) {
-                toast.success(`User ${newStatus === 'banned' ? 'banned' : 'activated'} successfully`)
-                queryClient.invalidateQueries({ queryKey: ['user', id] })
-                queryClient.invalidateQueries({ queryKey: ['users'] })
+            if (previousUser) {
+                queryClient.setQueryData(queryKeys.users.detail(id || ''), {
+                    ...previousUser,
+                    status: newStatus,
+                })
             }
-        } catch (error) {
-            console.error(`Error changing status:`, error)
+
+            return { previousUser }
+        },
+        onError: (err, newStatus, context) => {
+            if (context?.previousUser) {
+                queryClient.setQueryData(queryKeys.users.detail(id || ''), context.previousUser)
+            }
             toast.error(`Failed to update user status`)
-        } finally {
-            setActionLoading(false)
-        }
-    }
+        },
+        onSettled: (data, error, variables) => {
+            if (data?.success) {
+                toast.success(`User ${variables === 'banned' ? 'banned' : 'activated'} successfully`)
+            }
+            queryClient.invalidateQueries({ queryKey: queryKeys.users.detail(id || '') })
+            queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
+        },
+    })
 
     return (
 
@@ -573,9 +587,12 @@ export default function UserDetailsPage() {
                 <div className="container mx-auto space-y-6 max-w-5xl">
                     <ProfileHeader
                         user={user}
-                        onStatusChange={handleStatusChange}
+                        onStatusChange={(status) => toggleStatus(status)}
                         actionLoading={actionLoading}
-                        onUserUpdated={() => queryClient.invalidateQueries({ queryKey: ['user', id] })}
+                        onUserUpdated={() => {
+                            queryClient.invalidateQueries({ queryKey: queryKeys.users.detail(id || '') })
+                            queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
+                        }}
                     />
                     <ProfileContent user={user} />
                 </div>
