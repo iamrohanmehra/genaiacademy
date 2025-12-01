@@ -24,7 +24,9 @@ export default function Page() {
     const logToken = async () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.access_token) {
-        console.log("🔑 Access Token:", session.access_token)
+        console.log("🔹 Bearer Token:", session.access_token)
+      } else {
+        console.log("🔸 No active session or token found")
       }
     }
     logToken()

@@ -144,8 +144,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       }
       return data.user
     },
-    initialData: data.user,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 
   const user = userData
@@ -174,7 +172,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        {user && <NavUser user={user} />}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

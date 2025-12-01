@@ -71,6 +71,7 @@ export function SectionCards() {
                     "w-[300px] justify-start text-left font-normal",
                     !date && "text-muted-foreground"
                   )}
+                  aria-label="Select date range"
                 >
                   <IconCalendar className="mr-2 h-4 w-4" />
                   {date?.from ? (
