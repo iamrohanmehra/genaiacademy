@@ -48,7 +48,9 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "~/components/ui/popover"
-import { Calendar } from "~/components/ui/calendar"
+// import { Calendar } from "~/components/ui/calendar"
+import React from "react"
+const Calendar = React.lazy(() => import("~/components/ui/calendar").then(module => ({ default: module.Calendar })))
 import { api, ApiError } from "~/lib/api.client"
 import { queryKeys } from "~/lib/query-keys"
 import { cn } from "~/lib/utils"
@@ -628,14 +630,16 @@ export default function CourseContentPage() {
                                                         </Button>
                                                     </PopoverTrigger>
                                                     <PopoverContent className="w-auto p-0">
-                                                        <Calendar
-                                                            mode="single"
-                                                            selected={selectedChapter.accessOn}
-                                                            onSelect={(date) =>
-                                                                handleUpdateChapter("accessOn", date)
-                                                            }
-                                                            initialFocus
-                                                        />
+                                                        <React.Suspense fallback={<div className="p-4">Loading...</div>}>
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={selectedChapter.accessOn}
+                                                                onSelect={(date) =>
+                                                                    handleUpdateChapter("accessOn", date)
+                                                                }
+                                                                initialFocus
+                                                            />
+                                                        </React.Suspense>
                                                     </PopoverContent>
                                                 </Popover>
                                             </div>

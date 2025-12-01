@@ -1,0 +1,319 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "routes/home": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/login": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/signup": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/dashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/users": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/users-details": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/courses": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/courses/create": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/courses-details": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/courses/edit": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/course-content": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/student/dashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "app/root.tsx",
+        "path": "",
+        "config": {}
+      },
+      "routes/home": {
+        "id": "routes/home",
+        "parentId": "root",
+        "file": "app/routes/home.tsx",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/login": {
+        "id": "routes/login",
+        "parentId": "root",
+        "file": "app/routes/login.tsx",
+        "path": "login",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/signup": {
+        "id": "routes/signup",
+        "parentId": "root",
+        "file": "app/routes/signup.tsx",
+        "path": "signup",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/layout": {
+        "id": "routes/admin/layout",
+        "parentId": "root",
+        "file": "app/routes/admin/layout.tsx",
+        "config": {}
+      },
+      "routes/admin/dashboard": {
+        "id": "routes/admin/dashboard",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/dashboard.tsx",
+        "path": "admin/dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/users": {
+        "id": "routes/admin/users",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/users.tsx",
+        "path": "admin/users",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/users-details": {
+        "id": "routes/admin/users-details",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/users-details.tsx",
+        "path": "admin/users/:id",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/courses": {
+        "id": "routes/admin/courses",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/courses.tsx",
+        "path": "admin/courses",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/courses/create": {
+        "id": "routes/admin/courses/create",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/courses/create.tsx",
+        "path": "admin/courses/create",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/courses-details": {
+        "id": "routes/admin/courses-details",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/courses-details.tsx",
+        "path": "admin/courses/:id",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/courses/edit": {
+        "id": "routes/admin/courses/edit",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/courses/edit.tsx",
+        "path": "admin/courses/:id/edit",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/course-content": {
+        "id": "routes/admin/course-content",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/course-content.tsx",
+        "path": "admin/courses/:id/content",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/student/dashboard": {
+        "id": "routes/student/dashboard",
+        "parentId": "root",
+        "file": "app/routes/student/dashboard.tsx",
+        "path": "student/dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "/Users/himanshu/Documents/genaiacademy/app",
+    "basename": "/",
+    "buildDirectory": "/Users/himanshu/Documents/genaiacademy/build",
+    "future": {
+      "v8_middleware": false,
+      "unstable_optimizeDeps": false,
+      "unstable_splitRouteModules": false,
+      "unstable_subResourceIntegrity": false,
+      "unstable_viteEnvironmentApi": false
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "root.tsx",
+        "path": ""
+      },
+      "routes/home": {
+        "id": "routes/home",
+        "parentId": "root",
+        "file": "routes/home.tsx",
+        "index": true
+      },
+      "routes/login": {
+        "id": "routes/login",
+        "parentId": "root",
+        "file": "routes/login.tsx",
+        "path": "login"
+      },
+      "routes/signup": {
+        "id": "routes/signup",
+        "parentId": "root",
+        "file": "routes/signup.tsx",
+        "path": "signup"
+      },
+      "routes/admin/layout": {
+        "id": "routes/admin/layout",
+        "parentId": "root",
+        "file": "routes/admin/layout.tsx"
+      },
+      "routes/admin/dashboard": {
+        "id": "routes/admin/dashboard",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/dashboard.tsx",
+        "path": "admin/dashboard"
+      },
+      "routes/admin/users": {
+        "id": "routes/admin/users",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/users.tsx",
+        "path": "admin/users"
+      },
+      "routes/admin/users-details": {
+        "id": "routes/admin/users-details",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/users-details.tsx",
+        "path": "admin/users/:id"
+      },
+      "routes/admin/courses": {
+        "id": "routes/admin/courses",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/courses.tsx",
+        "path": "admin/courses"
+      },
+      "routes/admin/courses/create": {
+        "id": "routes/admin/courses/create",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/courses/create.tsx",
+        "path": "admin/courses/create"
+      },
+      "routes/admin/courses-details": {
+        "id": "routes/admin/courses-details",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/courses-details.tsx",
+        "path": "admin/courses/:id"
+      },
+      "routes/admin/courses/edit": {
+        "id": "routes/admin/courses/edit",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/courses/edit.tsx",
+        "path": "admin/courses/:id/edit"
+      },
+      "routes/admin/course-content": {
+        "id": "routes/admin/course-content",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/course-content.tsx",
+        "path": "admin/courses/:id/content"
+      },
+      "routes/student/dashboard": {
+        "id": "routes/student/dashboard",
+        "parentId": "root",
+        "file": "routes/student/dashboard.tsx",
+        "path": "student/dashboard"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true,
+    "unstable_routeConfig": [
+      {
+        "id": "root",
+        "path": "",
+        "file": "root.tsx",
+        "children": [
+          {
+            "file": "routes/home.tsx",
+            "index": true
+          },
+          {
+            "file": "routes/login.tsx",
+            "path": "login"
+          },
+          {
+            "file": "routes/signup.tsx",
+            "path": "signup"
+          },
+          {
+            "file": "routes/admin/layout.tsx",
+            "children": [
+              {
+                "file": "routes/admin/dashboard.tsx",
+                "path": "admin/dashboard"
+              },
+              {
+                "file": "routes/admin/users.tsx",
+                "path": "admin/users"
+              },
+              {
+                "file": "routes/admin/users-details.tsx",
+                "path": "admin/users/:id"
+              },
+              {
+                "file": "routes/admin/courses.tsx",
+                "path": "admin/courses"
+              },
+              {
+                "file": "routes/admin/courses/create.tsx",
+                "path": "admin/courses/create"
+              },
+              {
+                "file": "routes/admin/courses-details.tsx",
+                "path": "admin/courses/:id"
+              },
+              {
+                "file": "routes/admin/courses/edit.tsx",
+                "path": "admin/courses/:id/edit"
+              },
+              {
+                "file": "routes/admin/course-content.tsx",
+                "path": "admin/courses/:id/content"
+              }
+            ]
+          },
+          {
+            "file": "routes/student/dashboard.tsx",
+            "path": "student/dashboard"
+          }
+        ]
+      }
+    ]
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}

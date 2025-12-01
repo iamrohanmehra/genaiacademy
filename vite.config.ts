@@ -12,7 +12,7 @@ export default defineConfig(({ isSsrBuild }) => ({
     drop: ['console', 'debugger'],
   },
   build: {
-    sourcemap: false,
+    sourcemap: true,
     rollupOptions: {
       output: isSsrBuild ? undefined : {
         manualChunks: {

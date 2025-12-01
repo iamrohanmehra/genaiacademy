@@ -12,7 +12,8 @@ import { addDays, format } from "date-fns"
 
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
-import { Calendar } from "~/components/ui/calendar"
+// import { Calendar } from "~/components/ui/calendar"
+const Calendar = React.lazy(() => import("~/components/ui/calendar").then(module => ({ default: module.Calendar })))
 import {
   Card,
   CardAction,
@@ -87,14 +88,16 @@ export function SectionCards() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="end">
-                <Calendar
-                  initialFocus
-                  mode="range"
-                  defaultMonth={date?.from}
-                  selected={date}
-                  onSelect={setDate}
-                  numberOfMonths={2}
-                />
+                <React.Suspense fallback={<div className="p-4">Loading...</div>}>
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={setDate}
+                    numberOfMonths={2}
+                  />
+                </React.Suspense>
               </PopoverContent>
             </Popover>
           )}
