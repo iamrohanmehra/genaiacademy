@@ -48,6 +48,13 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "~/components/ui/popover"
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "~/components/ui/select"
 // import { Calendar } from "~/components/ui/calendar"
 import { TiptapEditor } from "~/components/tiptap-editor"
 import React from "react"
@@ -251,17 +258,7 @@ export default function CourseContentPage() {
         }))
     })
 
-    // Fetch Selected Chapter Details
-    const { data: selectedChapterData } = useQuery({
-        queryKey: queryKeys.courses.contentDetail(selectedChapterId || ''),
-        queryFn: async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            const token = session?.access_token
-            if (!token) throw new ApiError("Unauthorized", 401)
-            return api.get<{ data: CourseContent }>(`/api/admin/content/${selectedChapterId}`, token)
-        },
-        enabled: !!selectedChapterId,
-    })
+
 
     const contentData = contentQueries.map(q => q.data)
 
@@ -472,7 +469,20 @@ export default function CourseContentPage() {
         if (!selectedChapterId) return
         const chapter = sections.flatMap(s => s.chapters).find(c => c.id === selectedChapterId)
         if (chapter) {
-            updateChapterMutation.mutate({ id: chapter.id, data: chapter })
+            // Extract only editable fields to avoid sending immutable data (id, createdAt, etc.)
+            // which can cause 500 errors on the backend.
+            const payload: Partial<CourseContent> = {
+                title: chapter.title,
+                desc: chapter.desc,
+                type: chapter.type,
+                videoLink: chapter.videoLink,
+                xp: chapter.xp,
+                accessOn: chapter.accessOn,
+                accessTill: chapter.accessTill,
+                accessOnDate: chapter.accessOnDate,
+                accessTillDate: chapter.accessTillDate,
+            }
+            updateChapterMutation.mutate({ id: chapter.id, data: payload })
         }
     }
 
@@ -480,6 +490,71 @@ export default function CourseContentPage() {
 
     const handleDragStart = (event: DragStartEvent) => {
         setActiveDragId(event.active.id as string)
+    }
+
+    const handleDragOver = (event: DragOverEvent) => {
+        const { active, over } = event
+        if (!over) return
+
+        const activeId = active.id as string
+        const overId = over.id as string
+
+        // Only handle Chapter dragging here
+        if (active.data.current?.type !== "CHAPTER") return
+
+        // Find the containers
+        const activeSection = sections.find(s => s.chapters.some(c => c.id === activeId))
+        const overSection = sections.find(s => s.id === overId || s.chapters.some(c => c.id === overId))
+
+        if (!activeSection || !overSection) return
+
+        // If different sections, move the item to the new section
+        if (activeSection.id !== overSection.id) {
+            setSections((prev) => {
+                const activeItems = activeSection.chapters
+                const overItems = overSection.chapters
+                const activeIndex = activeItems.findIndex(c => c.id === activeId)
+                const overIndex = overItems.findIndex(c => c.id === overId)
+
+                let newIndex: number
+                if (overId === overSection.id) {
+                    // Dropped on the section header -> add to end (or beginning?)
+                    // Let's add to the end for now, or 0 if empty
+                    newIndex = overItems.length + 1
+                } else {
+                    // Dropped on another chapter
+                    const isBelowOverItem =
+                        over &&
+                        active.rect.current.translated &&
+                        active.rect.current.translated.top >
+                        over.rect.top + over.rect.height;
+
+                    const modifier = isBelowOverItem ? 1 : 0;
+                    newIndex = overIndex >= 0 ? overIndex + modifier : overItems.length + 1;
+                }
+
+                return prev.map(s => {
+                    if (s.id === activeSection.id) {
+                        return {
+                            ...s,
+                            chapters: s.chapters.filter(c => c.id !== activeId)
+                        }
+                    }
+                    if (s.id === overSection.id) {
+                        const newChapter = { ...activeSection.chapters[activeIndex], sectionId: overSection.id }
+                        return {
+                            ...s,
+                            chapters: [
+                                ...overItems.slice(0, newIndex),
+                                newChapter,
+                                ...overItems.slice(newIndex, overItems.length)
+                            ]
+                        }
+                    }
+                    return s
+                })
+            })
+        }
     }
 
     const handleDragEnd = (event: DragEndEvent) => {
@@ -512,55 +587,66 @@ export default function CourseContentPage() {
 
         // Moving Chapters
         if (active.data.current?.type === "CHAPTER") {
-            // Find source and destination sections
-            const sourceSection = sections.find((s) =>
-                s.chapters.some((c) => c.id === activeId)
-            )
-            const destSection = sections.find(
-                (s) =>
-                    s.id === overId || s.chapters.some((c) => c.id === overId)
-            )
+            const originalChapter = active.data.current.chapter as CourseContent
 
-            if (!sourceSection || !destSection) return
+            // Find where it ended up
+            const newSection = sections.find(s => s.chapters.some(c => c.id === activeId))
+            if (!newSection) return
 
-            // If moving within the same section
-            if (sourceSection.id === destSection.id) {
-                const oldIndex = sourceSection.chapters.findIndex(
-                    (c) => c.id === activeId
-                )
-                const newIndex = sourceSection.chapters.findIndex(
-                    (c) => c.id === overId
-                )
+            const newIndex = newSection.chapters.findIndex(c => c.id === activeId)
 
-                if (oldIndex !== newIndex) {
-                    setSections(
-                        sections.map((s) => {
-                            if (s.id === sourceSection.id) {
-                                const newChapters = arrayMove(s.chapters, oldIndex, newIndex)
-                                // Call API to reorder
-                                const sortedOrder = newChapters.map((c, index) => ({ id: c.id, order: index + 1 }))
-                                reorderMutation.mutate({ type: 'content', sortedOrder })
-                                return {
-                                    ...s,
-                                    chapters: newChapters,
-                                }
-                            }
-                            return s
-                        })
-                    )
+            // Check if it moved sections
+            if (newSection.id !== originalChapter.sectionId) {
+                // 1. Update Chapter's Section ID
+                updateChapterMutation.mutate({
+                    id: activeId,
+                    data: { sectionId: newSection.id }
+                })
+
+                // 2. Reorder Destination Section
+                const destSortedOrder = newSection.chapters.map((c, index) => ({ id: c.id, order: index + 1 }))
+                reorderMutation.mutate({ type: 'content', sortedOrder: destSortedOrder })
+
+                // 3. Reorder Source Section (to close gaps)
+                const sourceSection = sections.find(s => s.id === originalChapter.sectionId)
+                if (sourceSection) {
+                    // Note: The source section in 'sections' state already has the item removed by onDragOver
+                    const sourceSortedOrder = sourceSection.chapters.map((c, index) => ({ id: c.id, order: index + 1 }))
+                    reorderMutation.mutate({ type: 'content', sortedOrder: sourceSortedOrder })
+                }
+
+                toast.success("Chapter moved to new section")
+            } else {
+                // Same section reorder
+                const oldIndex = sections.find(s => s.id === newSection.id)?.chapters.findIndex(c => c.id === activeId)
+
+                // Note: onDragOver doesn't handle same-section reordering usually, so we might need to do arrayMove here
+                // BUT if we want onDragOver to handle EVERYTHING, we should add same-section logic to onDragOver too.
+                // However, for simplicity, let's stick to arrayMove here if onDragOver didn't touch it.
+                // Wait, if onDragOver didn't fire (same container), we need to handle it here.
+
+                if (activeId !== overId) {
+                    setSections((prev) => prev.map(s => {
+                        if (s.id === newSection.id) {
+                            const oldIdx = s.chapters.findIndex(c => c.id === activeId)
+                            const newIdx = s.chapters.findIndex(c => c.id === overId)
+                            const newChapters = arrayMove(s.chapters, oldIdx, newIdx)
+
+                            const sortedOrder = newChapters.map((c, index) => ({ id: c.id, order: index + 1 }))
+                            reorderMutation.mutate({ type: 'content', sortedOrder })
+
+                            return { ...s, chapters: newChapters }
+                        }
+                        return s
+                    }))
                     toast.success("Chapters reordered")
                 }
-            } else {
-                // Moving between sections (simplified: append to end if dropped on section, or insert if dropped on chapter)
-                // For now, let's just handle same-section reordering to keep it simple as per initial plan, 
-                // but the structure allows for cross-section if we implement `onDragOver` correctly.
-                // Given the complexity, I'll stick to same-section reordering for now unless `dnd-kit` makes it easy.
-                // Actually, `dnd-kit` needs `onDragOver` for cross-container sorting.
             }
         }
     }
 
-    const selectedChapter = selectedChapterData?.data || sections
+    // Use local state (sections) as the source of truth for the editor to support optimistic updates.
+    const selectedChapter = sections
         .flatMap((s) => s.chapters)
         .find((c) => c.id === selectedChapterId)
 
@@ -592,6 +678,7 @@ export default function CourseContentPage() {
                                 sensors={sensors}
                                 collisionDetection={closestCenter}
                                 onDragStart={handleDragStart}
+                                onDragOver={handleDragOver}
                                 onDragEnd={handleDragEnd}
                             >
                                 <SortableContext
@@ -703,9 +790,44 @@ export default function CourseContentPage() {
                                             />
                                         </div>
 
+                                        <div className="grid gap-6 md:grid-cols-2">
+                                            <div className="space-y-2">
+                                                <Label>Content Type</Label>
+                                                <Select
+                                                    value={selectedChapter.type}
+                                                    onValueChange={(value) =>
+                                                        handleUpdateChapter("type", value)
+                                                    }
+                                                >
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select type" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="video">Video</SelectItem>
+                                                        <SelectItem value="liveClass">Live Class</SelectItem>
+                                                        <SelectItem value="assignment">Assignment</SelectItem>
+                                                        <SelectItem value="article">Article</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label>XP (Experience Points)</Label>
+                                                <Input
+                                                    type="number"
+                                                    value={selectedChapter.xp ?? 0}
+                                                    onChange={(e) =>
+                                                        handleUpdateChapter("xp", parseInt(e.target.value) || 0)
+                                                    }
+                                                    placeholder="e.g. 50"
+                                                />
+                                            </div>
+                                        </div>
+
                                         <div className="space-y-2">
                                             <Label>Content (Rich Text)</Label>
                                             <TiptapEditor
+                                                key={selectedChapter.id}
                                                 value={selectedChapter.desc || ''}
                                                 onChange={(value) =>
                                                     handleUpdateChapter("desc", value)
@@ -713,26 +835,53 @@ export default function CourseContentPage() {
                                             />
                                         </div>
 
+                                        <div className="space-y-2">
+                                            <Label>Video Link</Label>
+                                            <div className="flex items-center gap-2">
+                                                <Video className="h-4 w-4 text-muted-foreground" />
+                                                <Input
+                                                    value={selectedChapter.videoLink || ''}
+                                                    onChange={(e) =>
+                                                        handleUpdateChapter(
+                                                            "videoLink",
+                                                            e.target.value
+                                                        )
+                                                    }
+                                                    placeholder="Video URL"
+                                                />
+                                            </div>
+                                        </div>
+
+
                                         <div className="grid gap-6 md:grid-cols-2">
                                             <div className="space-y-2">
-                                                <Label>Video Link</Label>
-                                                <div className="flex items-center gap-2">
-                                                    <Video className="h-4 w-4 text-muted-foreground" />
-                                                    <Input
-                                                        value={selectedChapter.videoLink || ''}
-                                                        onChange={(e) =>
-                                                            handleUpdateChapter(
-                                                                "videoLink",
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        placeholder="Video URL"
-                                                    />
-                                                </div>
+                                                <Label>Access On (Days after enrollment)</Label>
+                                                <Input
+                                                    type="number"
+                                                    value={selectedChapter.accessOn ?? 0}
+                                                    onChange={(e) =>
+                                                        handleUpdateChapter("accessOn", parseInt(e.target.value) || 0)
+                                                    }
+                                                    placeholder="0"
+                                                />
                                             </div>
-
                                             <div className="space-y-2">
-                                                <Label>Access On</Label>
+                                                <Label>Access Till (Days duration)</Label>
+                                                <Input
+                                                    type="number"
+                                                    value={selectedChapter.accessTill ?? ''}
+                                                    onChange={(e) => {
+                                                        const val = e.target.value
+                                                        handleUpdateChapter("accessTill", val === '' ? null : parseInt(val))
+                                                    }}
+                                                    placeholder="Unlimited"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid gap-6 md:grid-cols-2">
+                                            <div className="space-y-2">
+                                                <Label>Access Starts On (Specific Date)</Label>
                                                 <Popover>
                                                     <PopoverTrigger asChild>
                                                         <Button
@@ -765,6 +914,41 @@ export default function CourseContentPage() {
                                                     </PopoverContent>
                                                 </Popover>
                                             </div>
+
+                                            <div className="space-y-2">
+                                                <Label>Access Ends On (Specific Date)</Label>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            variant={"outline"}
+                                                            className={cn(
+                                                                "w-full justify-start text-left font-normal",
+                                                                !selectedChapter.accessTillDate &&
+                                                                "text-muted-foreground"
+                                                            )}
+                                                        >
+                                                            <CalendarIcon className="mr-2 h-4 w-4" />
+                                                            {selectedChapter.accessTillDate ? (
+                                                                format(new Date(selectedChapter.accessTillDate), "PPP")
+                                                            ) : (
+                                                                <span>Pick a date</span>
+                                                            )}
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0">
+                                                        <React.Suspense fallback={<div className="p-4">Loading...</div>}>
+                                                            <Calendar
+                                                                mode="single"
+                                                                selected={selectedChapter.accessTillDate ? new Date(selectedChapter.accessTillDate) : undefined}
+                                                                onSelect={(date) =>
+                                                                    handleUpdateChapter("accessTillDate", date?.toISOString())
+                                                                }
+                                                                initialFocus
+                                                            />
+                                                        </React.Suspense>
+                                                    </PopoverContent>
+                                                </Popover>
+                                            </div>
                                         </div>
 
                                         <div className="space-y-2">
@@ -783,6 +967,6 @@ export default function CourseContentPage() {
                     </Card>
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
