@@ -21,15 +21,27 @@ import { supabase } from "~/lib/supabase"
 
 export default function Page() {
   useEffect(() => {
-    const logToken = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.access_token) {
-        console.log("🔹 Bearer Token:", session.access_token)
+        console.log("🔹 [Initial] Bearer Token:", session.access_token)
       } else {
-        console.log("🔸 No active session or token found")
+        console.log("🔸 [Initial] No active session found")
       }
-    }
-    logToken()
+    })
+
+    // Listen for auth changes (e.g. session restore)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.access_token) {
+        console.log("🔹 [AuthChange] Bearer Token:", session.access_token)
+      } else {
+        console.log("🔸 [AuthChange] No active session found")
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   return (
