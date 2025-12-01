@@ -14,21 +14,24 @@ import {
 import { NavMain } from "~/components/nav-main"
 import { NavProjects } from "~/components/nav-projects"
 import { NavUser } from "~/components/nav-user"
-import { TeamSwitcher } from "~/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
 } from "~/components/ui/sidebar"
+import { supabase } from "~/lib/supabase"
 
 // This is sample data.
 const data = {
   user: {
     name: "Admin User",
     email: "admin@genaiacademy.com",
-    avatar: "/avatars/admin.jpg",
+    avatar: "https://github.com/shadcn.png",
   },
   teams: [
     {
@@ -126,17 +129,47 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = React.useState(data.user)
+
+  React.useEffect(() => {
+    const getUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        setUser({
+          name: session.user.user_metadata.full_name || session.user.email?.split('@')[0] || "User",
+          email: session.user.email || "",
+          avatar: session.user.user_metadata.avatar_url || "https://github.com/shadcn.png",
+        })
+      }
+    }
+    getUser()
+  }, [])
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <a href="/admin/dashboard">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <GalleryVerticalEnd className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">GenAI Academy</span>
+                  <span className="truncate text-xs">Admin Console</span>
+                </div>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

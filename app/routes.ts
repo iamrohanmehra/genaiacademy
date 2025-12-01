@@ -13,6 +13,7 @@ export default [
         route("admin/courses", "routes/admin/courses.tsx"),
         route("admin/courses/create", "routes/admin/courses/create.tsx"),
         route("admin/courses/:id", "routes/admin/courses-details.tsx"),
+        route("admin/courses/:id/edit", "routes/admin/courses/edit.tsx"),
         route("admin/courses/:id/content", "routes/admin/course-content.tsx"),
     ]),
 

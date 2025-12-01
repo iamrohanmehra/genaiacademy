@@ -207,7 +207,7 @@ export default function CoursesPage() {
             }
 
             // Note: API docs don't specify search/pagination for courses yet, fetching all
-            return api.get<{ data: Course[] }>('/api/admin/courses', token)
+            return api.get<{ success: boolean; data: Course[]; count: number }>('/api/admin/courses', token)
         },
         placeholderData: keepPreviousData,
     })

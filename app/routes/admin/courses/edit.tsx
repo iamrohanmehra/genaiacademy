@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { useNavigate, Link } from "react-router"
+import { useState, useEffect } from "react"
+import { useNavigate, Link, useParams } from "react-router"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { format } from "date-fns"
 import { CalendarIcon, Loader2, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
+import { useQuery } from "@tanstack/react-query"
 
 import { cn } from "~/lib/utils"
 import { Button } from "~/components/ui/button"
@@ -35,13 +36,11 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "~/components/ui/popover"
-import { AppSidebar } from "~/components/app-sidebar"
-import { SiteHeader } from "~/components/site-header"
-import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar"
 import { supabase } from "~/lib/supabase"
-import { api } from "~/lib/api.client"
+import { api, ApiError } from "~/lib/api.client"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "~/components/ui/card"
 
+// Reuse schema from create page
 const formSchema = z.object({
     title: z.string().min(2, "Title must be at least 2 characters."),
     desc: z.string().min(10, "Description must be at least 10 characters."),
@@ -64,9 +63,35 @@ const formSchema = z.object({
     nextClassDesc: z.string().optional(),
 })
 
-export default function CreateCoursePage() {
+type Course = {
+    id: string
+    title: string
+    desc: string
+    schedule: string
+    type: string
+    topic: number
+    price: string
+    payable: string
+    certificateFee: string
+    association: string
+    limit: number
+    banner: string
+    startDate: string
+    endDate: string
+    whatsAppGroupLink: string
+    resourcesLink: string
+    nextClassTopic: string
+    nextClassLink: string
+    nextClassDesc: string
+    status: "live" | "private" | "completed"
+    createdAt: string
+    updatedAt: string
+}
+
+export default function EditCoursePage() {
+    const { id } = useParams()
     const navigate = useNavigate()
-    const [loading, setLoading] = useState(false)
+    const [submitting, setSubmitting] = useState(false)
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -91,8 +116,53 @@ export default function CreateCoursePage() {
         },
     })
 
+    // Fetch course details
+    const { data: course, isLoading } = useQuery({
+        queryKey: ['course', id],
+        queryFn: async () => {
+            if (!id) throw new Error("No course ID")
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+
+            if (!token) {
+                throw new ApiError("Unauthorized", 401)
+            }
+
+            const result = await api.get<{ success: boolean; data: Course }>(`/api/admin/courses/${id}`, token)
+            return result.data
+        },
+        enabled: !!id,
+    })
+
+    // Pre-fill form when data is loaded
+    useEffect(() => {
+        if (course) {
+            form.reset({
+                title: course.title,
+                desc: course.desc,
+                schedule: course.schedule,
+                type: course.type as any,
+                topic: course.topic,
+                price: parseFloat(course.price),
+                payable: parseFloat(course.payable),
+                certificateFee: parseFloat(course.certificateFee),
+                limit: course.limit,
+                startDate: new Date(course.startDate),
+                endDate: new Date(course.endDate),
+                status: course.status as any,
+                association: course.association || "",
+                banner: course.banner || "",
+                whatsAppGroupLink: course.whatsAppGroupLink || "",
+                resourcesLink: course.resourcesLink || "",
+                nextClassTopic: course.nextClassTopic || "",
+                nextClassLink: course.nextClassLink || "",
+                nextClassDesc: course.nextClassDesc || "",
+            })
+        }
+    }, [course, form])
+
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        setLoading(true)
+        setSubmitting(true)
         try {
             const { data: { session } } = await supabase.auth.getSession()
             const token = session?.access_token
@@ -112,35 +182,53 @@ export default function CreateCoursePage() {
                 endDate: values.endDate.toISOString(),
             }
 
-            // Remove empty strings to avoid backend validation errors on optional fields
-            const payload = Object.fromEntries(
-                Object.entries(rawPayload).filter(([_, v]) => v !== "")
-            );
+            // Remove empty strings to avoid overwriting with empty values if that's not intended
+            // But for edit, we might want to clear values. The API docs say "Only provide fields you want to update".
+            // Sending everything is safer to ensure state matches form.
 
-            const result = await api.post<{ success: boolean; message: string; data: any }>('/api/admin/courses', payload, token)
+            const result = await api.put<{ success: boolean; message: string; data: Course }>(`/api/admin/courses/${id}`, rawPayload, token)
+
             if (result.success) {
-                toast.success("Course created successfully")
-                navigate("/admin/courses")
+                toast.success("Course updated successfully")
+                navigate(`/admin/courses/${id}`)
             }
         } catch (error) {
             console.error(error)
-            toast.error(error instanceof Error ? error.message : "Failed to create course")
+            toast.error(error instanceof Error ? error.message : "Failed to update course")
         } finally {
-            setLoading(false)
+            setSubmitting(false)
         }
     }
 
-    return (
+    if (isLoading) {
+        return (
+            <div className="flex h-screen w-full items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
+    }
 
+    if (!course) {
+        return (
+            <div className="flex h-screen w-full flex-col items-center justify-center gap-4">
+                <p className="text-muted-foreground">Course not found</p>
+                <Button asChild variant="outline">
+                    <Link to="/admin/courses">Go Back</Link>
+                </Button>
+            </div>
+        )
+    }
+
+    return (
         <div className="flex flex-1 flex-col p-4 pt-0">
             <div className="container mx-auto space-y-6 max-w-5xl">
                 <div className="flex items-center gap-2 py-4">
                     <Button variant="ghost" size="icon" asChild>
-                        <Link to="/admin/courses">
+                        <Link to={`/admin/courses/${id}`}>
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>
-                    <h2 className="text-lg font-semibold">Create New Course</h2>
+                    <h2 className="text-lg font-semibold">Edit Course</h2>
                 </div>
 
                 <Form {...form}>
@@ -508,9 +596,9 @@ export default function CreateCoursePage() {
                         </div>
 
                         <div className="flex justify-end">
-                            <Button type="submit" disabled={loading} size="lg">
-                                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Create Course
+                            <Button type="submit" disabled={submitting} size="lg">
+                                {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Update Course
                             </Button>
                         </div>
                     </form>

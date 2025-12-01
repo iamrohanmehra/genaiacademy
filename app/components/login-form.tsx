@@ -77,6 +77,13 @@ export function LoginForm({
                 }
             }
 
+            // Check if user is banned
+            if (user.status === 'banned') {
+                toast.error("Your account has been banned. Please contact support.")
+                await supabase.auth.signOut()
+                return
+            }
+
             // Route based on role
             if (user.role === 'admin') {
                 toast.success(`Welcome back, ${user.name}!`)

@@ -15,7 +15,7 @@ import {
     Loader2,
     Trash2
 } from "lucide-react"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 
 import { Button } from "~/components/ui/button"
@@ -46,6 +46,16 @@ import {
     DropdownMenuLabel,
     DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "~/components/ui/dialog"
+import { Input } from "~/components/ui/input"
+import { Label } from "~/components/ui/label"
 
 // Define Course Type (same as in courses.tsx)
 type Course = {
@@ -73,9 +83,73 @@ type Course = {
     updatedAt: string
 }
 
+function DeleteCourseDialog({ course, open, onOpenChange }: { course: Course, open: boolean, onOpenChange: (open: boolean) => void }) {
+    const queryClient = useQueryClient()
+    const navigate = useNavigate()
+    const [confirmInput, setConfirmInput] = useState("")
+    const [loading, setLoading] = useState(false)
+
+    const isValid = confirmInput === "delete course"
+
+    const handleDelete = async () => {
+        if (!isValid) return
+        setLoading(true)
+        try {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) return
+
+            const result = await api.delete<{ success: boolean }>(`/api/admin/courses/${course.id}`, token)
+            if (result.success) {
+                toast.success("Course deleted successfully")
+                await queryClient.invalidateQueries({ queryKey: ['courses'] })
+                navigate("/admin/courses")
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error("Failed to delete course")
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Delete Course</DialogTitle>
+                    <DialogDescription>This will permanently delete the course and all related information.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label>To confirm, type ‘delete course’.</Label>
+                        <Input
+                            value={confirmInput}
+                            onChange={e => setConfirmInput(e.target.value)}
+                            placeholder="delete course"
+                        />
+                    </div>
+                    <div className="bg-destructive/15 text-destructive p-3 rounded-md text-sm font-medium flex items-center gap-2">
+                        <Trash2 className="h-4 w-4" />
+                        Deleting a course cannot be undone.
+                    </div>
+                </div>
+                <DialogFooter className="sm:justify-between">
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+                    <Button variant="destructive" onClick={handleDelete} disabled={!isValid || loading}>
+                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Delete Course
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
 export default function CourseDetailsPage() {
     const { id } = useParams()
     const navigate = useNavigate()
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
     const { data: course, isLoading: loading } = useQuery({
         queryKey: ['course', id],
@@ -88,7 +162,7 @@ export default function CourseDetailsPage() {
                 throw new ApiError("Unauthorized", 401)
             }
 
-            const result = await api.get<{ data: Course }>(`/api/admin/courses/${id}`, token)
+            const result = await api.get<{ success: boolean; data: Course }>(`/api/admin/courses/${id}`, token)
             return result.data
         },
         enabled: !!id,
@@ -116,6 +190,7 @@ export default function CourseDetailsPage() {
     return (
 
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+            <DeleteCourseDialog course={course} open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen} />
             <div className="flex items-center gap-2 py-4">
                 <Button variant="ghost" size="icon" asChild>
                     <Link to="/admin/courses">
@@ -146,7 +221,9 @@ export default function CourseDetailsPage() {
                                     Manage Content
                                 </Link>
                             </Button>
-                            <Button variant="outline">Edit Course</Button>
+                            <Button variant="outline" asChild>
+                                <Link to={`/admin/courses/${id}/edit`}>Edit Course</Link>
+                            </Button>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="icon">
@@ -154,7 +231,7 @@ export default function CourseDetailsPage() {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem className="text-destructive">
+                                    <DropdownMenuItem className="text-destructive" onClick={() => setIsDeleteDialogOpen(true)}>
                                         <Trash2 className="mr-2 h-4 w-4" />
                                         Delete Course
                                     </DropdownMenuItem>
