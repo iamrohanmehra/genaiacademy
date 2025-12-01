@@ -37,7 +37,7 @@ import {
 } from "lucide-react"
 import { toast } from "sonner"
 import { format } from "date-fns"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
@@ -61,41 +61,16 @@ import { Separator } from "~/components/ui/separator"
 
 // --- Types ---
 
-type Chapter = {
-    id: string
-    title: string
-    content: string
-    assignment: string
-    videoId: string
-    accessOn: Date | undefined
-}
+import type { CourseSection, CourseContent } from "~/types/course"
 
-type Section = {
-    id: string
-    title: string
-    chapters: Chapter[]
+type SectionWithContent = CourseSection & {
+    chapters: CourseContent[]
     isExpanded: boolean
 }
 
 // --- Mock Data ---
 
-const initialSections: Section[] = [
-    {
-        id: "section-1",
-        title: "Introduction",
-        isExpanded: true,
-        chapters: [
-            {
-                id: "chapter-1",
-                title: "Welcome to the Course",
-                content: "Welcome content...",
-                assignment: "",
-                videoId: "12345",
-                accessOn: new Date(),
-            },
-        ],
-    },
-]
+// --- Mock Data Removed ---
 
 // --- Sortable Components ---
 
@@ -106,7 +81,7 @@ function SortableSection({
     onAddChapter,
     children,
 }: {
-    section: Section
+    section: SectionWithContent
     onToggle: (id: string) => void
     onDelete: (id: string) => void
     onAddChapter: (sectionId: string) => void
@@ -188,7 +163,7 @@ function SortableChapter({
     onClick,
     onDelete,
 }: {
-    chapter: Chapter
+    chapter: CourseContent
     isSelected: boolean
     onClick: () => void
     onDelete: (e: React.MouseEvent) => void
@@ -243,33 +218,120 @@ function SortableChapter({
 // --- Main Component ---
 
 export default function CourseContentPage() {
-    const { id } = useParams()
-    // const [sections, setSections] = useState<Section[]>(initialSections) // Removed initial mock data
-    const [sections, setSections] = useState<Section[]>([])
+    const { id: courseId } = useParams()
+    const [sections, setSections] = useState<SectionWithContent[]>([])
+    const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null)
+    const queryClient = useQueryClient()
 
-    const { data: queryData, isLoading } = useQuery({
-        queryKey: queryKeys.courses.content(id || ''),
-        queryFn: async () => {
-            // Simulate API call or fetch real data if endpoint exists
-            // For now returning mock data to maintain functionality
-            return new Promise<Section[]>((resolve) => {
-                setTimeout(() => resolve(initialSections), 500)
-            })
-        },
-        enabled: !!id,
+    // Fetch Sections
+    const { data: sectionsData } = useQuery({
+        queryKey: queryKeys.courses.sections(courseId || ''),
+        queryFn: () => api.get<{ data: CourseSection[] }>(`/api/admin/courses/${courseId}/sections`),
+        enabled: !!courseId,
     })
 
-    const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null)
+    // Fetch Content
+    const { data: contentData } = useQuery({
+        queryKey: queryKeys.courses.content(courseId || ''),
+        queryFn: () => api.get<{ data: CourseContent[] }>(`/api/admin/courses/${courseId}/content`),
+        enabled: !!courseId,
+    })
 
-    // Sync query data to local state for DnD
+    // Combine Data
     useEffect(() => {
-        if (queryData) {
-            setSections(queryData)
-            if (!selectedChapterId && queryData.length > 0 && queryData[0].chapters.length > 0) {
-                setSelectedChapterId(queryData[0].chapters[0].id)
-            }
+        if (sectionsData?.data && contentData?.data) {
+            const combined: SectionWithContent[] = sectionsData.data.map(section => ({
+                ...section,
+                isExpanded: true, // Default to expanded
+                chapters: contentData.data
+                    .filter(c => c.sectionId === section.id)
+                    .sort((a, b) => a.order - b.order)
+            })).sort((a, b) => a.order - b.order)
+
+            setSections(combined)
         }
-    }, [queryData])
+    }, [sectionsData, contentData])
+
+    // --- Mutations ---
+
+    const createSectionMutation = useMutation({
+        mutationFn: (title: string) =>
+            api.post<{ data: CourseSection }>(`/api/admin/courses/${courseId}/sections`, {
+                title,
+                order: sections.length + 1
+            }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.sections(courseId!) })
+            toast.success("Section created")
+        },
+        onError: (error: ApiError) => toast.error(error.message)
+    })
+
+    const deleteSectionMutation = useMutation({
+        mutationFn: (sectionId: string) => api.delete(`/api/admin/sections/${sectionId}`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.sections(courseId!) })
+            toast.success("Section deleted")
+        },
+        onError: (error: ApiError) => toast.error(error.message)
+    })
+
+    const updateSectionMutation = useMutation({
+        mutationFn: ({ id, title }: { id: string, title: string }) =>
+            api.put(`/api/admin/sections/${id}`, { title }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.sections(courseId!) })
+        },
+        onError: (error: ApiError) => toast.error(error.message)
+    })
+
+    const createChapterMutation = useMutation({
+        mutationFn: (sectionId: string) =>
+            api.post<{ data: CourseContent }>(`/api/admin/sections/${sectionId}/content`, {
+                courseId,
+                title: "New Chapter",
+                type: "video",
+                order: sections.find(s => s.id === sectionId)?.chapters.length || 0 + 1
+            }),
+        onSuccess: (data) => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.content(courseId!) })
+            setSelectedChapterId(data.data.id)
+            toast.success("Chapter added")
+        },
+        onError: (error: ApiError) => toast.error(error.message)
+    })
+
+    const deleteChapterMutation = useMutation({
+        mutationFn: (chapterId: string) => api.delete(`/api/admin/content/${chapterId}`),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.content(courseId!) })
+            setSelectedChapterId(null)
+            toast.success("Chapter deleted")
+        },
+        onError: (error: ApiError) => toast.error(error.message)
+    })
+
+    const updateChapterMutation = useMutation({
+        mutationFn: ({ id, data }: { id: string, data: Partial<CourseContent> }) =>
+            api.put(`/api/admin/content/${id}`, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.content(courseId!) })
+            toast.success("Chapter saved")
+        },
+        onError: (error: ApiError) => toast.error(error.message)
+    })
+
+    const reorderMutation = useMutation({
+        mutationFn: (payload: { type: 'section' | 'content', sortedOrder: { id: string, order: number }[] }) =>
+            api.put('/api/admin/sort-order', payload),
+        onSuccess: () => {
+            // Optimistic update handled by local state, but we should invalidate to be safe
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.sections(courseId!) })
+            queryClient.invalidateQueries({ queryKey: queryKeys.courses.content(courseId!) })
+        },
+        onError: (error: ApiError) => toast.error(error.message)
+    })
+
 
     const [activeDragId, setActiveDragId] = useState<string | null>(null)
 
@@ -283,20 +345,12 @@ export default function CourseContentPage() {
     // --- Actions ---
 
     const handleAddSection = () => {
-        const newSection: Section = {
-            id: `section-${Date.now()}`,
-            title: "New Section",
-            chapters: [],
-            isExpanded: true,
-        }
-        setSections([...sections, newSection])
-        toast.success("Section created")
+        createSectionMutation.mutate("New Section")
     }
 
     const handleDeleteSection = (sectionId: string) => {
         if (confirm("Are you sure you want to delete this section?")) {
-            setSections(sections.filter((s) => s.id !== sectionId))
-            toast.success("Section deleted")
+            deleteSectionMutation.mutate(sectionId)
         }
     }
 
@@ -309,42 +363,18 @@ export default function CourseContentPage() {
     }
 
     const handleAddChapter = (sectionId: string) => {
-        const newChapter: Chapter = {
-            id: `chapter-${Date.now()}`,
-            title: "New Chapter",
-            content: "",
-            assignment: "",
-            videoId: "",
-            accessOn: undefined,
-        }
-        setSections(
-            sections.map((s) =>
-                s.id === sectionId
-                    ? { ...s, chapters: [...s.chapters, newChapter], isExpanded: true }
-                    : s
-            )
-        )
-        setSelectedChapterId(newChapter.id)
-        toast.success("Chapter added")
+        createChapterMutation.mutate(sectionId)
     }
 
     const handleDeleteChapter = (chapterId: string) => {
         if (confirm("Are you sure you want to delete this chapter?")) {
-            setSections(
-                sections.map((s) => ({
-                    ...s,
-                    chapters: s.chapters.filter((c) => c.id !== chapterId),
-                }))
-            )
-            if (selectedChapterId === chapterId) {
-                setSelectedChapterId(null)
-            }
-            toast.success("Chapter deleted")
+            deleteChapterMutation.mutate(chapterId)
         }
     }
 
-    const handleUpdateChapter = (field: keyof Chapter, value: any) => {
+    const handleUpdateChapter = (field: keyof CourseContent, value: any) => {
         if (!selectedChapterId) return
+        // Optimistic update for local state
         setSections(
             sections.map((s) => ({
                 ...s,
@@ -356,14 +386,25 @@ export default function CourseContentPage() {
     }
 
     const handleUpdateSectionTitle = (sectionId: string, title: string) => {
+        // Optimistic update
         setSections(
             sections.map((s) => (s.id === sectionId ? { ...s, title } : s))
         )
+        // Debounce this in a real app, for now we can just update on blur or have a save button? 
+        // The UI has an input that updates on change. Let's use onBlur for the API call to avoid too many requests.
+    }
+
+    // Helper for title update on blur
+    const handleSectionTitleBlur = (sectionId: string, title: string) => {
+        updateSectionMutation.mutate({ id: sectionId, title })
     }
 
     const handleSaveChapter = () => {
-        toast.success("Chapter saved successfully")
-        // In a real app, this would make an API call
+        if (!selectedChapterId) return
+        const chapter = sections.flatMap(s => s.chapters).find(c => c.id === selectedChapterId)
+        if (chapter) {
+            updateChapterMutation.mutate({ id: chapter.id, data: chapter })
+        }
     }
 
     // --- Drag and Drop Logic ---
@@ -387,7 +428,13 @@ export default function CourseContentPage() {
                 setSections((items) => {
                     const oldIndex = items.findIndex((i) => i.id === activeId)
                     const newIndex = items.findIndex((i) => i.id === overId)
-                    return arrayMove(items, oldIndex, newIndex)
+                    const newItems = arrayMove(items, oldIndex, newIndex)
+
+                    // Call API to reorder
+                    const sortedOrder = newItems.map((s, index) => ({ id: s.id, order: index + 1 }))
+                    reorderMutation.mutate({ type: 'section', sortedOrder })
+
+                    return newItems
                 })
                 toast.success("Sections reordered")
             }
@@ -420,9 +467,13 @@ export default function CourseContentPage() {
                     setSections(
                         sections.map((s) => {
                             if (s.id === sourceSection.id) {
+                                const newChapters = arrayMove(s.chapters, oldIndex, newIndex)
+                                // Call API to reorder
+                                const sortedOrder = newChapters.map((c, index) => ({ id: c.id, order: index + 1 }))
+                                reorderMutation.mutate({ type: 'content', sortedOrder })
                                 return {
                                     ...s,
-                                    chapters: arrayMove(s.chapters, oldIndex, newIndex),
+                                    chapters: newChapters,
                                 }
                             }
                             return s
@@ -449,7 +500,7 @@ export default function CourseContentPage() {
             <div className="container mx-auto space-y-6 max-w-5xl h-full">
                 <div className="flex items-center gap-2 py-4">
                     <Button variant="ghost" size="icon" asChild>
-                        <Link to={`/admin/courses/${id}`}>
+                        <Link to={`/admin/courses/${courseId}`}>
                             <ArrowLeft className="h-4 w-4" />
                         </Link>
                     </Button>
@@ -497,6 +548,7 @@ export default function CourseContentPage() {
                                                     }
                                                     className="mb-2 h-8"
                                                     placeholder="Section Title"
+                                                    onBlur={(e) => handleSectionTitleBlur(section.id, e.target.value)}
                                                 />
                                                 <SortableContext
                                                     items={section.chapters.map((c) => c.id)}
@@ -585,27 +637,27 @@ export default function CourseContentPage() {
                                         <div className="space-y-2">
                                             <Label>Content (Rich Text)</Label>
                                             <TiptapEditor
-                                                value={selectedChapter.content}
+                                                value={selectedChapter.desc || ''}
                                                 onChange={(value) =>
-                                                    handleUpdateChapter("content", value)
+                                                    handleUpdateChapter("desc", value)
                                                 }
                                             />
                                         </div>
 
                                         <div className="grid gap-6 md:grid-cols-2">
                                             <div className="space-y-2">
-                                                <Label>Video ID</Label>
+                                                <Label>Video Link</Label>
                                                 <div className="flex items-center gap-2">
                                                     <Video className="h-4 w-4 text-muted-foreground" />
                                                     <Input
-                                                        value={selectedChapter.videoId}
+                                                        value={selectedChapter.videoLink || ''}
                                                         onChange={(e) =>
                                                             handleUpdateChapter(
-                                                                "videoId",
+                                                                "videoLink",
                                                                 e.target.value
                                                             )
                                                         }
-                                                        placeholder="Bunny Stream / YouTube ID"
+                                                        placeholder="Video URL"
                                                     />
                                                 </div>
                                             </div>
@@ -618,13 +670,13 @@ export default function CourseContentPage() {
                                                             variant={"outline"}
                                                             className={cn(
                                                                 "w-full justify-start text-left font-normal",
-                                                                !selectedChapter.accessOn &&
+                                                                !selectedChapter.accessOnDate &&
                                                                 "text-muted-foreground"
                                                             )}
                                                         >
                                                             <CalendarIcon className="mr-2 h-4 w-4" />
-                                                            {selectedChapter.accessOn ? (
-                                                                format(selectedChapter.accessOn, "PPP")
+                                                            {selectedChapter.accessOnDate ? (
+                                                                format(new Date(selectedChapter.accessOnDate), "PPP")
                                                             ) : (
                                                                 <span>Pick a date</span>
                                                             )}
@@ -634,9 +686,9 @@ export default function CourseContentPage() {
                                                         <React.Suspense fallback={<div className="p-4">Loading...</div>}>
                                                             <Calendar
                                                                 mode="single"
-                                                                selected={selectedChapter.accessOn}
+                                                                selected={selectedChapter.accessOnDate ? new Date(selectedChapter.accessOnDate) : undefined}
                                                                 onSelect={(date) =>
-                                                                    handleUpdateChapter("accessOn", date)
+                                                                    handleUpdateChapter("accessOnDate", date?.toISOString())
                                                                 }
                                                                 initialFocus
                                                             />
@@ -648,16 +700,7 @@ export default function CourseContentPage() {
 
                                         <div className="space-y-2">
                                             <Label>Assignment / Resources</Label>
-                                            <Textarea
-                                                value={selectedChapter.assignment}
-                                                onChange={(e) =>
-                                                    handleUpdateChapter(
-                                                        "assignment",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                placeholder="Link to assignment or resource description..."
-                                            />
+                                            <p className="text-xs text-muted-foreground">Use the description field above for assignments.</p>
                                         </div>
                                     </div>
                                 </CardContent>

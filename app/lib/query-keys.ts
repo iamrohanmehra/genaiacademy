@@ -3,7 +3,9 @@ export const queryKeys = {
     courses: {
         all: ['courses'] as const,
         detail: (id: string) => ['course', id] as const,
-        content: (id: string) => ['course-content', id] as const,
+        sections: (id: string) => ['course', id, 'sections'] as const,
+        section: (id: string) => ['section', id] as const,
+        content: (id: string) => ['course', id, 'content'] as const,
         search: (query: string) => ['courses', 'search', query] as const,
     },
     users: {
