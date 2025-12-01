@@ -54,6 +54,12 @@ This is a **STRICTLY FRONTEND** repository.
 - Use named exports for reusable UI components.
 - Follow the `app/` directory structure: `routes`, `components`, `hooks`, `lib`.
 
+
+### Admin Panel Patterns
+- **Reusable Dialogs**: Extract complex dialogs (e.g., Edit, Delete) into `app/components/admin/<feature>/`. Do not define them inside the page component.
+- **Search Components**: Use `shadcn/ui` Popover + Command for searchable dropdowns (e.g., `UserEmailSearch`, `CourseSearch`).
+- **Folder Structure**: Keep admin components organized by feature (e.g., `app/components/admin/users`, `app/components/admin/courses`).
+
 ### Supabase Integration
 - Use the exported `supabase` client from `app/lib/supabase.ts`.
 - **Security**: Do not use Supabase Admin SDK or service keys in this repo. Client-side keys (`ANON_KEY`) only.

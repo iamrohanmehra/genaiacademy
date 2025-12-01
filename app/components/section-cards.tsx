@@ -5,10 +5,13 @@ import {
   IconCurrencyDollar,
   IconSchool,
   IconTrendingUp,
+  IconTrendingDown,
+  IconMinus,
   IconUserPlus,
 } from "@tabler/icons-react"
 import { type DateRange } from "react-day-picker"
 import { addDays, format } from "date-fns"
+import { useQuery } from "@tanstack/react-query"
 
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
@@ -35,13 +38,119 @@ import {
   SelectValue,
 } from "~/components/ui/select"
 import { cn } from "~/lib/utils"
+import { api } from "~/lib/api.client"
+import { queryKeys } from "~/lib/query-keys"
+import { supabase } from "~/lib/supabase"
+import { Skeleton } from "~/components/ui/skeleton"
+
+type Metric = {
+  current: number
+  previous: number
+  change: number
+  changePercentage: number
+  trend: "up" | "down" | "neutral"
+}
+
+type OverviewData = {
+  userSignups: Metric
+  totalEnrollments: Metric
+  paidEnrollments: Metric
+  totalRevenue: Metric
+}
 
 export function SectionCards() {
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 7),
   })
-  const [filter, setFilter] = React.useState("last-7")
+  const [filter, setFilter] = React.useState("today")
+
+  const { data: overviewData, isLoading } = useQuery({
+    queryKey: queryKeys.overview(filter,
+      filter === 'custom' && date?.from ? format(date.from, 'yyyy-MM-dd') : undefined,
+      filter === 'custom' && date?.from ? format(date.from, 'yyyy-MM-dd') : undefined,
+      filter === 'custom' && date?.to ? format(date.to, 'yyyy-MM-dd') : undefined
+    ),
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) return null
+
+      let queryParams = `?filter=${filter}`
+      if (filter === 'custom' && date?.from) {
+        if (date.to) {
+          queryParams = `?filter=customRange&startDate=${format(date.from, 'yyyy-MM-dd')}&endDate=${format(date.to, 'yyyy-MM-dd')}`
+        } else {
+          queryParams = `?filter=customDate&customDate=${format(date.from, 'yyyy-MM-dd')}`
+        }
+      }
+
+      const response = await api.get<{ success: boolean; data: OverviewData }>(
+        `/api/admin/overview${queryParams}`,
+        token
+      )
+      return response.data
+    },
+    enabled: true,
+  })
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount / 100)
+  }
+
+  const renderTrendIcon = (trend: string) => {
+    if (trend === 'up') return <IconTrendingUp className="mr-1 h-3 w-3" />
+    if (trend === 'down') return <IconTrendingDown className="mr-1 h-3 w-3" />
+    return <IconMinus className="mr-1 h-3 w-3" />
+  }
+
+  const renderMetricCard = (title: string, metric: Metric | undefined, icon: React.ReactNode, formatter: (val: number) => string = (val) => val.toString(), description: string) => {
+    if (isLoading || !metric) {
+      return (
+        <Card className="@container/card">
+          <CardHeader>
+            <CardDescription><Skeleton className="h-4 w-24" /></CardDescription>
+            <CardTitle><Skeleton className="h-8 w-16" /></CardTitle>
+          </CardHeader>
+          <CardFooter>
+            <Skeleton className="h-4 w-full" />
+          </CardFooter>
+        </Card>
+      )
+    }
+
+    return (
+      <Card className="@container/card">
+        <CardHeader>
+          <CardDescription>{title}</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            {formatter(metric.current)}
+          </CardTitle>
+          <CardAction>
+            <Badge variant="outline" className={cn(
+              metric.trend === 'up' ? "text-green-600 border-green-200 bg-green-50" :
+                metric.trend === 'down' ? "text-red-600 border-red-200 bg-red-50" :
+                  "text-gray-600 border-gray-200 bg-gray-50"
+            )}>
+              {renderTrendIcon(metric.trend)}
+              {metric.changePercentage > 0 ? '+' : ''}{metric.changePercentage.toFixed(1)}%
+            </Badge>
+          </CardAction>
+        </CardHeader>
+        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+          <div className="line-clamp-1 flex gap-2 font-medium">
+            {metric.trend === 'up' ? 'Trending up' : metric.trend === 'down' ? 'Trending down' : 'Stable'} {icon}
+          </div>
+          <div className="text-muted-foreground">
+            {description}
+          </div>
+        </CardFooter>
+      </Card>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -55,8 +164,10 @@ export function SectionCards() {
             <SelectContent>
               <SelectItem value="today">Today</SelectItem>
               <SelectItem value="yesterday">Yesterday</SelectItem>
-              <SelectItem value="last-7">Last 7 days</SelectItem>
-              <SelectItem value="last-30">Last 30 days</SelectItem>
+              <SelectItem value="thisWeek">This Week</SelectItem>
+              <SelectItem value="thisMonth">This Month</SelectItem>
+              <SelectItem value="lastMonth">Last Month</SelectItem>
+              <SelectItem value="last90Days">Last 90 Days</SelectItem>
               <SelectItem value="custom">Custom Date</SelectItem>
             </SelectContent>
           </Select>
@@ -106,94 +217,10 @@ export function SectionCards() {
       </div>
 
       <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-        <Card className="@container/card">
-          <CardHeader>
-            <CardDescription>New Signups</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              128
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline">
-                <IconTrendingUp />
-                +12.5%
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Trending up this week <IconUserPlus className="size-4" />
-            </div>
-            <div className="text-muted-foreground">
-              Total signups for selected period
-            </div>
-          </CardFooter>
-        </Card>
-        <Card className="@container/card">
-          <CardHeader>
-            <CardDescription>New Enrollments</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              85
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline">
-                <IconTrendingUp />
-                +5.2%
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Steady growth <IconSchool className="size-4" />
-            </div>
-            <div className="text-muted-foreground">
-              Students enrolled in courses
-            </div>
-          </CardFooter>
-        </Card>
-        <Card className="@container/card">
-          <CardHeader>
-            <CardDescription>Revenue This Period</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              $12,450
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline">
-                <IconTrendingUp />
-                +18%
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Exceeding targets <IconCurrencyDollar className="size-4" />
-            </div>
-            <div className="text-muted-foreground">
-              Gross revenue from all sources
-            </div>
-          </CardFooter>
-        </Card>
-        <Card className="@container/card">
-          <CardHeader>
-            <CardDescription>Learning Time</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              1,240h
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline">
-                <IconTrendingUp />
-                +8.5%
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              High engagement <IconClock className="size-4" />
-            </div>
-            <div className="text-muted-foreground">
-              Total hours spent by learners
-            </div>
-          </CardFooter>
-        </Card>
+        {renderMetricCard("New Signups", overviewData?.userSignups, <IconUserPlus className="size-4" />, undefined, "Total signups for selected period")}
+        {renderMetricCard("Total Enrollments", overviewData?.totalEnrollments, <IconSchool className="size-4" />, undefined, "Students enrolled in courses")}
+        {renderMetricCard("Paid Enrollments", overviewData?.paidEnrollments, <IconSchool className="size-4" />, undefined, "Enrollments with payment")}
+        {renderMetricCard("Revenue", overviewData?.totalRevenue, <IconCurrencyDollar className="size-4" />, formatCurrency, "Gross revenue from all sources")}
       </div>
     </div>
   )

@@ -14,7 +14,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import { useQuery, keepPreviousData } from "@tanstack/react-query"
+import { useQuery, keepPreviousData, useMutation, useQueryClient } from "@tanstack/react-query"
 import { ArrowUpDown, ChevronDown, MoreHorizontal, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
@@ -46,6 +46,8 @@ import { queryKeys } from "~/lib/query-keys"
 import { useNavigate } from "react-router"
 import { useDebounce } from "~/hooks/use-debounce"
 import { UserEmailSearch } from "~/components/admin/users/user-email-search"
+import { EditUserDialog } from "~/components/admin/users/edit-user-dialog"
+import { DeleteUserDialog } from "~/components/admin/users/delete-user-dialog"
 
 // Define User Type
 export type User = {
@@ -60,26 +62,79 @@ export type User = {
 }
 
 const UserActions = React.memo(({ user }: { user: User }) => {
+    const [showEditDialog, setShowEditDialog] = React.useState(false)
+    const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
+    const queryClient = useQueryClient()
+    const navigate = useNavigate()
+
+    const { mutate: toggleStatus } = useMutation({
+        mutationFn: async (newStatus: 'active' | 'banned') => {
+            const { data: { session } } = await supabase.auth.getSession()
+            const token = session?.access_token
+            if (!token) throw new ApiError("Unauthorized", 401)
+
+            const endpoint = newStatus === 'banned' ? 'ban' : 'activate'
+            const result = await api.post<{ success: boolean }>(`/api/admin/users/${user.id}/${endpoint}`, {}, token)
+            return result
+        },
+        onSuccess: (data, variables) => {
+            if (data.success) {
+                toast.success(`User ${variables === 'banned' ? 'banned' : 'activated'} successfully`)
+                queryClient.invalidateQueries({ queryKey: queryKeys.users.all })
+            }
+        },
+        onError: () => {
+            toast.error("Failed to update user status")
+        }
+    })
+
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <MoreHorizontal className="h-4 w-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                    onClick={() => navigator.clipboard.writeText(user.id)}
-                >
-                    Copy User ID
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>View details</DropdownMenuItem>
-                <DropdownMenuItem>Edit user</DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+            <EditUserDialog
+                user={user}
+                open={showEditDialog}
+                onOpenChange={setShowEditDialog}
+                onUserUpdated={() => queryClient.invalidateQueries({ queryKey: queryKeys.users.all })}
+            />
+            <DeleteUserDialog
+                user={user}
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+            />
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                    <DropdownMenuItem
+                        onClick={() => navigator.clipboard.writeText(user.id)}
+                    >
+                        Copy User ID
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate(`/admin/users/${user.id}`)}>
+                        View details
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+                        Edit user
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => toggleStatus(user.status === 'active' ? 'banned' : 'active')}>
+                        {user.status === 'active' ? 'Ban User' : 'Activate User'}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        onClick={() => setShowDeleteDialog(true)}
+                        className="text-destructive focus:text-destructive"
+                    >
+                        Delete user
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </>
     )
 })
 UserActions.displayName = "UserActions"
