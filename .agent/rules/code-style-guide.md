@@ -67,9 +67,21 @@ This is a **STRICTLY FRONTEND** repository.
 
 
 ### Admin Panel Patterns
-- **Reusable Dialogs**: Extract complex dialogs (e.g., Edit, Delete) into `app/components/admin/<feature>/`. Do not define them inside the page component.
-- **Search Components**: Use `shadcn/ui` Popover + Command for searchable dropdowns (e.g., `UserEmailSearch`, `CourseSearch`).
-- **Folder Structure**: Keep admin components organized by feature (e.g., `app/components/admin/users`, `app/components/admin/courses`).
+- **CRUD Structure**:
+    - **List Page**: `/admin/<feature>` (Table with pagination/search).
+    - **Create Page**: `/admin/<feature>/create` (Separate page for complex forms).
+    - **Details Page**: `/admin/<feature>/:id` (Read-only view with actions).
+    - **Edit/Delete**: Use **Dialogs** (`Edit<Feature>Dialog`, `Delete<Feature>Dialog`) triggered from the Details or List page.
+- **Reusable Dialogs**: Extract complex dialogs into `app/components/admin/<feature>/`.
+- **Search Components**: Use `shadcn/ui` Popover + Command for searchable dropdowns.
+- **Folder Structure**: Keep admin components organized by feature.
+
+### Shadcn UI & Icons
+- **Installation**: If a component is missing, install it using `bunx --bun shadcn@latest add <component-name>`.
+- **Icons**: Use `lucide-react` for all icons.
+
+### Routing
+- **Registration**: **ALWAYS** register new routes in `app/routes.ts` immediately after creating the page component. Failure to do so will result in 404s.
 
 ### Supabase Integration
 - Use the exported `supabase` client from `app/lib/supabase.ts`.

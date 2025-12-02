@@ -1,5 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL
 
+import { type Enrollment, type EnrollmentsResponse, type CreateEnrollmentPayload, type UpdateEnrollmentPayload } from "~/types/enrollment";
+
 interface FetchOptions extends RequestInit {
     token?: string
 }
@@ -68,6 +70,28 @@ export class ApiClient {
 
     async delete<T>(endpoint: string, token?: string): Promise<T> {
         return this.request<T>(endpoint, { method: 'DELETE', token })
+    }
+
+    // Enrollments
+    // Enrollments
+    async getEnrollments(token?: string): Promise<EnrollmentsResponse> {
+        return this.get<EnrollmentsResponse>("/api/admin/enrollments", token);
+    }
+
+    async getEnrollmentById(id: string, token?: string): Promise<{ success: boolean; data: Enrollment }> {
+        return this.get<{ success: boolean; data: Enrollment }>(`/api/admin/enrollments/${id}`, token);
+    }
+
+    async createEnrollment(data: CreateEnrollmentPayload, token?: string): Promise<{ success: boolean; data: Enrollment }> {
+        return this.post<{ success: boolean; data: Enrollment }>("/api/admin/enrollments", data, token);
+    }
+
+    async updateEnrollment(id: string, data: UpdateEnrollmentPayload, token?: string): Promise<{ success: boolean; data: Enrollment }> {
+        return this.put<{ success: boolean; data: Enrollment }>(`/api/admin/enrollments/${id}`, data, token);
+    }
+
+    async deleteEnrollment(id: string, token?: string): Promise<{ success: boolean; data: Enrollment }> {
+        return this.delete<{ success: boolean; data: Enrollment }>(`/api/admin/enrollments/${id}`, token);
     }
 }
 

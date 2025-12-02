@@ -15,7 +15,11 @@
       "routes/signup": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/dashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/users": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/users/create": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/users-details": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/enrollments": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/enrollments/create": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/enrollment-details": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/courses": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/courses/create": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/courses/edit": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
@@ -81,11 +85,47 @@
           "runtime": "nodejs"
         }
       },
+      "routes/admin/users/create": {
+        "id": "routes/admin/users/create",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/users/create.tsx",
+        "path": "admin/users/create",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
       "routes/admin/users-details": {
         "id": "routes/admin/users-details",
         "parentId": "routes/admin/layout",
         "file": "app/routes/admin/users-details.tsx",
         "path": "admin/users/:id",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/enrollments": {
+        "id": "routes/admin/enrollments",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/enrollments.tsx",
+        "path": "admin/enrollments",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/enrollments/create": {
+        "id": "routes/admin/enrollments/create",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/enrollments/create.tsx",
+        "path": "admin/enrollments/create",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/enrollment-details": {
+        "id": "routes/admin/enrollment-details",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/enrollment-details.tsx",
+        "path": "admin/enrollments/:id",
         "config": {
           "runtime": "nodejs"
         }
@@ -198,11 +238,35 @@
         "file": "routes/admin/users.tsx",
         "path": "admin/users"
       },
+      "routes/admin/users/create": {
+        "id": "routes/admin/users/create",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/users/create.tsx",
+        "path": "admin/users/create"
+      },
       "routes/admin/users-details": {
         "id": "routes/admin/users-details",
         "parentId": "routes/admin/layout",
         "file": "routes/admin/users-details.tsx",
         "path": "admin/users/:id"
+      },
+      "routes/admin/enrollments": {
+        "id": "routes/admin/enrollments",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/enrollments.tsx",
+        "path": "admin/enrollments"
+      },
+      "routes/admin/enrollments/create": {
+        "id": "routes/admin/enrollments/create",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/enrollments/create.tsx",
+        "path": "admin/enrollments/create"
+      },
+      "routes/admin/enrollment-details": {
+        "id": "routes/admin/enrollment-details",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/enrollment-details.tsx",
+        "path": "admin/enrollments/:id"
       },
       "routes/admin/courses": {
         "id": "routes/admin/courses",
@@ -278,8 +342,24 @@
                 "path": "admin/users"
               },
               {
+                "file": "routes/admin/users/create.tsx",
+                "path": "admin/users/create"
+              },
+              {
                 "file": "routes/admin/users-details.tsx",
                 "path": "admin/users/:id"
+              },
+              {
+                "file": "routes/admin/enrollments.tsx",
+                "path": "admin/enrollments"
+              },
+              {
+                "file": "routes/admin/enrollments/create.tsx",
+                "path": "admin/enrollments/create"
+              },
+              {
+                "file": "routes/admin/enrollment-details.tsx",
+                "path": "admin/enrollments/:id"
               },
               {
                 "file": "routes/admin/courses.tsx",

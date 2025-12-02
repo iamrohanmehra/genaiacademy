@@ -11,6 +11,9 @@ export default [
         route("admin/users", "routes/admin/users.tsx"),
         route("admin/users/create", "routes/admin/users/create.tsx"),
         route("admin/users/:id", "routes/admin/users-details.tsx"),
+        route("admin/enrollments", "routes/admin/enrollments.tsx"),
+        route("admin/enrollments/create", "routes/admin/enrollments/create.tsx"),
+        route("admin/enrollments/:id", "routes/admin/enrollment-details.tsx"),
         route("admin/courses", "routes/admin/courses.tsx"),
         route("admin/courses/create", "routes/admin/courses/create.tsx"),
 

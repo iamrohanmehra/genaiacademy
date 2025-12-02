@@ -16,6 +16,10 @@ export const queryKeys = {
         detail: (id: string) => ['user', id] as const,
         searchByEmail: (email: string) => ['users', 'search', 'email', email] as const,
     },
+    enrollments: {
+        all: ['enrollments'] as const,
+        detail: (id: string) => ['enrollment', id] as const,
+    },
     overview: (filter: string, customDate?: string, startDate?: string, endDate?: string) =>
         ['overview', filter, customDate, startDate, endDate] as const,
 } as const;
