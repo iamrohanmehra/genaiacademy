@@ -110,6 +110,7 @@ const getInitials = (name: string) => {
 
 import { EditUserDialog } from "~/components/admin/users/edit-user-dialog"
 import { DeleteUserDialog } from "~/components/admin/users/delete-user-dialog"
+import { ChangePasswordDialog } from "~/components/admin/users/change-password-dialog"
 
 function ProfileHeader({ user, onStatusChange, actionLoading, onUserUpdated }: { user: UserDetails, onStatusChange: (status: 'active' | 'banned') => void, actionLoading: boolean, onUserUpdated: () => void }) {
     const [isEditOpen, setIsEditOpen] = useState(false)
@@ -192,6 +193,7 @@ function ProfileHeader({ user, onStatusChange, actionLoading, onUserUpdated }: {
 
 function ProfileContent({ user }: { user: UserDetails }) {
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+    const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false)
 
     return (
         <>
@@ -298,7 +300,12 @@ function ProfileContent({ user }: { user: UserDetails }) {
                                         <Label className="text-base">Password</Label>
                                         <p className="text-muted-foreground text-sm">Last changed 3 months ago</p>
                                     </div>
-                                    <Button variant="outline">
+                                    <ChangePasswordDialog
+                                        userId={user.id}
+                                        open={isChangePasswordOpen}
+                                        onOpenChange={setIsChangePasswordOpen}
+                                    />
+                                    <Button variant="outline" onClick={() => setIsChangePasswordOpen(true)}>
                                         <Key className="mr-2 h-4 w-4" />
                                         Change Password
                                     </Button>

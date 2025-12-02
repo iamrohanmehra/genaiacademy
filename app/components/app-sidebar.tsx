@@ -77,6 +77,10 @@ const data = {
           url: "/admin/users",
         },
         {
+          title: "Create User",
+          url: "/admin/users/create",
+        },
+        {
           title: "Enrollments",
           url: "/admin/enrollments",
         },

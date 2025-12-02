@@ -671,7 +671,94 @@ curl http://localhost:3000/api/admin/users/550e8400-e29b-41d4-a716-446655440000 
 
 ---
 
-### 5. Update User
+### 5. Create User
+
+**Endpoint:** `POST /api/admin/users`
+
+**Description:** Create a new user account. Password will be automatically hashed if provided. This endpoint is for admin use only.
+
+**Request Body:**
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "password": "securePassword123",
+  "mobile": "+1234567890",
+  "avatar": "https://example.com/avatar.jpg",
+  "role": "student",
+  "status": "active",
+  "globalXp": 0
+}
+```
+
+**Request:**
+```bash
+curl -X POST http://localhost:3000/api/admin/users \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -d '{
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "password": "securePassword123",
+    "mobile": "+1234567890",
+    "role": "student",
+    "status": "active"
+  }'
+```
+
+**Response:** `201 Created`
+```json
+{
+  "success": true,
+  "message": "User created successfully",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "mobile": "+1234567890",
+    "avatar": null,
+    "status": "active",
+    "role": "student",
+    "globalXp": 0,
+    "lastActivity": null,
+    "createdAt": "2024-12-01T10:00:00Z",
+    "updatedAt": "2024-12-01T10:00:00Z"
+  }
+}
+```
+
+**Required Fields:**
+- `name` (string) - User's full name
+- `email` (string) - Valid email address (must be unique)
+
+**Optional Fields:**
+- `password` (string) - Will be automatically hashed if provided
+- `mobile` (string) - Phone number
+- `avatar` (string) - Profile picture URL
+- `role` (enum: "admin", "operations", "student") - Default: "student"
+- `status` (enum: "active", "banned") - Default: "active"
+- `globalXp` (integer) - Experience points, default: 0
+- `lastActivity` (timestamp) - Last activity timestamp
+
+**Error Response:** `400 Bad Request`
+```json
+{
+  "success": false,
+  "error": "Name and email are required"
+}
+```
+
+**Error Response:** `500 Internal Server Error` (e.g., duplicate email)
+```json
+{
+  "success": false,
+  "error": "Failed to create user"
+}
+```
+
+---
+
+### 6. Update User
 
 **Endpoint:** `PUT /api/admin/users/:id`
 
@@ -731,9 +818,83 @@ curl -X PUT http://localhost:3000/api/admin/users/550e8400-e29b-41d4-a716-446655
 - `globalXp` (integer, default: 0) - Total experience points across all courses
 - `lastActivity` (timestamp)
 
+**Note:** To change password, use the dedicated password change endpoint below.
+
 ---
 
-### 4. Ban User
+### 7. Change User Password
+
+**Endpoint:** `PUT /api/admin/users/:id/password`
+
+**Description:** Change a user's password. Password will be automatically hashed. This endpoint is for admin use only.
+
+**Parameters:**
+- `id` (path, required) - User UUID
+
+**Request Body:**
+```json
+{
+  "password": "newSecurePassword123"
+}
+```
+
+**Request:**
+```bash
+curl -X PUT http://localhost:3000/api/admin/users/550e8400-e29b-41d4-a716-446655440000/password \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your-jwt-token>" \
+  -d '{
+    "password": "newSecurePassword123"
+  }'
+```
+
+**Response:** `200 OK`
+```json
+{
+  "success": true,
+  "message": "Password changed successfully",
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "email": "john@example.com",
+    "updatedAt": "2024-12-01T12:00:00Z"
+  }
+}
+```
+
+**Required Fields:**
+- `password` (string) - New password (minimum 6 characters)
+
+**Error Response:** `400 Bad Request`
+```json
+{
+  "success": false,
+  "error": "Password is required"
+}
+```
+
+```json
+{
+  "success": false,
+  "error": "Password must be at least 6 characters"
+}
+```
+
+**Error Response:** `404 Not Found`
+```json
+{
+  "success": false,
+  "error": "User not found"
+}
+```
+
+**Security Notes:**
+- Password is automatically hashed before storage
+- Only admins can change user passwords
+- Password is not returned in the response for security
+
+---
+
+### 8. Ban User
 
 **Endpoint:** `POST /api/admin/users/:id/ban`
 
@@ -797,7 +958,7 @@ curl -X POST http://localhost:3000/api/admin/users/550e8400-e29b-41d4-a716-44665
 
 ---
 
-### 6. Delete User
+### 9. Delete User
 
 **Endpoint:** `DELETE /api/admin/users/:id`
 

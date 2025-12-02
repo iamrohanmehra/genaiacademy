@@ -9,6 +9,7 @@ export default [
     layout("routes/admin/layout.tsx", [
         route("admin/dashboard", "routes/admin/dashboard.tsx"),
         route("admin/users", "routes/admin/users.tsx"),
+        route("admin/users/create", "routes/admin/users/create.tsx"),
         route("admin/users/:id", "routes/admin/users-details.tsx"),
         route("admin/courses", "routes/admin/courses.tsx"),
         route("admin/courses/create", "routes/admin/courses/create.tsx"),
