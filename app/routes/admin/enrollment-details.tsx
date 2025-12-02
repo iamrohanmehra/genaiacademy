@@ -12,6 +12,7 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { EditEnrollmentDialog } from "~/components/admin/enrollments/edit-enrollment-dialog";
 import { DeleteEnrollmentDialog } from "~/components/admin/enrollments/delete-enrollment-dialog";
+import { EditProgressDialog } from "~/components/admin/enrollments/edit-progress-dialog";
 
 export default function EnrollmentDetailsPage() {
     const { id } = useParams<{ id: string }>();
@@ -38,6 +39,18 @@ export default function EnrollmentDetailsPage() {
             }
             return failureCount < 3;
         },
+    });
+
+    const { data: progressData, isLoading: isProgressLoading } = useQuery({
+        queryKey: queryKeys.enrollments.progress(id!),
+        queryFn: async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            const token = session?.access_token;
+            if (!token) throw new ApiError("Unauthorized", 401);
+            if (!id) throw new Error("Enrollment ID is required");
+            return api.getCourseProgress(id, token);
+        },
+        enabled: !!id,
     });
 
     useEffect(() => {
@@ -223,6 +236,61 @@ export default function EnrollmentDetailsPage() {
                     </CardContent>
                 </Card>
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Detailed Course Progress</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {isProgressLoading ? (
+                        <div className="flex justify-center p-4">
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                        </div>
+                    ) : progressData?.data ? (
+                        <div className="space-y-6">
+                            {progressData.data.map((section) => (
+                                <div key={section.id} className="space-y-2">
+                                    <h3 className="font-semibold text-lg">{section.title}</h3>
+                                    <div className="border rounded-md divide-y">
+                                        {section.contents.map((content) => (
+                                            <div key={content.id} className="p-3 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-2 h-2 rounded-full ${content.progress?.status === 'completed' ? 'bg-green-500' : content.progress?.status === 'inProgress' ? 'bg-yellow-500' : 'bg-gray-300'}`} />
+                                                    <span className="font-medium">{content.title}</span>
+                                                </div>
+                                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                                    {content.progress ? (
+                                                        <>
+                                                            <div className="flex items-center gap-1">
+                                                                <span className="font-mono">{Math.round(content.progress.timeSpent / 60)}m</span>
+                                                            </div>
+                                                            <Badge variant={content.progress.status === 'completed' ? 'default' : 'secondary'}>
+                                                                {content.progress.status === 'completed' ? 'Completed' : 'In Progress'}
+                                                            </Badge>
+                                                        </>
+                                                    ) : (
+                                                        <span className="text-xs">Not Started</span>
+                                                    )}
+                                                    <EditProgressDialog
+                                                        enrollmentId={enrollment.id}
+                                                        contentId={content.id}
+                                                        contentTitle={content.title}
+                                                        currentProgress={content.progress}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center text-muted-foreground py-4">
+                            No progress data available.
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 }

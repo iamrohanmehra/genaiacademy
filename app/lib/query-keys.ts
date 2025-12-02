@@ -18,7 +18,8 @@ export const queryKeys = {
     },
     enrollments: {
         all: ['enrollments'] as const,
-        detail: (id: string) => ['enrollment', id] as const,
+        detail: (id: string) => [...queryKeys.enrollments.all, id] as const,
+        progress: (id: string) => [...queryKeys.enrollments.detail(id), 'progress'] as const,
     },
     overview: (filter: string, customDate?: string, startDate?: string, endDate?: string) =>
         ['overview', filter, customDate, startDate, endDate] as const,

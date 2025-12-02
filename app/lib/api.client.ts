@@ -1,6 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL
 
-import { type Enrollment, type EnrollmentsResponse, type CreateEnrollmentPayload, type UpdateEnrollmentPayload } from "~/types/enrollment";
+import { type Enrollment, type EnrollmentsResponse, type CreateEnrollmentPayload, type UpdateEnrollmentPayload, type CourseProgressResponse, type ProgressDetail } from "~/types/enrollment";
 
 interface FetchOptions extends RequestInit {
     token?: string
@@ -92,6 +92,18 @@ export class ApiClient {
 
     async deleteEnrollment(id: string, token?: string): Promise<{ success: boolean; data: Enrollment }> {
         return this.delete<{ success: boolean; data: Enrollment }>(`/api/admin/enrollments/${id}`, token);
+    }
+
+    async getCourseProgress(enrollmentId: string, token?: string): Promise<CourseProgressResponse> {
+        return this.get<CourseProgressResponse>(`/api/admin/enrollments/${enrollmentId}/progress`, token);
+    }
+
+    async getContentProgress(enrollmentId: string, contentId: string, token?: string): Promise<{ success: boolean; data: ProgressDetail }> {
+        return this.get<{ success: boolean; data: ProgressDetail }>(`/api/admin/enrollments/${enrollmentId}/content/${contentId}/progress`, token);
+    }
+
+    async updateContentProgress(enrollmentId: string, contentId: string, data: any, token?: string): Promise<{ success: boolean; data: ProgressDetail }> {
+        return this.post<{ success: boolean; data: ProgressDetail }>(`/api/admin/enrollments/${enrollmentId}/content/${contentId}/progress`, data, token);
     }
 }
 

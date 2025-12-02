@@ -72,3 +72,34 @@ export interface UpdateEnrollmentPayload {
     certificateId?: string;
     certificateGeneratedAt?: string;
 }
+
+export interface ProgressDetail {
+    id: string;
+    visited: number;
+    timeSpent: number;
+    progress: number;
+    status: 'inProgress' | 'completed';
+    userStatus: 'inProgress' | 'completed';
+    attendedLive: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface ContentProgress {
+    id: string;
+    title: string;
+    order: number;
+    progress: ProgressDetail | null;
+}
+
+export interface SectionProgress {
+    id: string;
+    title: string;
+    order: number;
+    contents: ContentProgress[];
+}
+
+export interface CourseProgressResponse {
+    success: boolean;
+    data: SectionProgress[];
+}

@@ -18,7 +18,7 @@ This is a **STRICTLY FRONTEND** repository.
 
 ## 2. Tech Stack & Standards
 - **Package Manager**: **ALWAYS** use `bun`. Do not use `npm`, `yarn`, or `pnpm`.
-- **Language**: TypeScript (Strict mode). Use `import type` for types.
+- **Language**: TypeScript (Strict mode). **ALWAYS** use `import type` for types to prevent `verbatimModuleSyntax` errors.
 - **Styling**: Tailwind CSS v4. Use utility classes. Avoid custom CSS files.
 - **UI Components**: Shadcn UI (Radix Primitives).
 - **Icons**: `lucide-react`.
@@ -35,6 +35,7 @@ This is a **STRICTLY FRONTEND** repository.
 - **Global Error Handling**: 401 Unauthorized errors are handled globally by `QueryClient`. Do not manually catch 401s unless specific local logic is required.
 - **Response Format**: Handle responses following the standard format: `{ success: boolean, message?: string, data?: any, error?: string }`.
 - **Authentication**: The `api` client automatically handles the `Authorization` header when the token is passed.
+- **Payload Types**: Define explicit types for API request payloads (e.g., `UpdateUserPayload`). Avoid using `any` for request bodies.
 
 ### State Management (React Query)
 - Use `useQuery` for fetching data.
@@ -54,6 +55,11 @@ This is a **STRICTLY FRONTEND** repository.
 - **Conditional Styling**: When using colored row highlights (e.g., for banned users), adjust child element styles (borders, backgrounds) to ensure visibility.
 - **Icon-Only Buttons**: **ALWAYS** provide an `aria-label` for buttons that only contain an icon to ensure accessibility for screen readers.
 - **Form Inputs**: Use `onBlur` for saving text field changes to avoid excessive API calls, while updating local state immediately for responsiveness.
+- **Status Indicators**: Use consistent color coding for status:
+    - Success/Completed/Active: Default/Green
+    - Warning/In Progress: Yellow/Orange
+    - Error/Destructive/Banned: Red/Destructive
+    - Neutral/Pending/Not Started: Grey/Secondary
 
 ### Component Structure
 - Use Functional Components with Hooks.
@@ -75,6 +81,7 @@ This is a **STRICTLY FRONTEND** repository.
 - **Reusable Dialogs**: Extract complex dialogs into `app/components/admin/<feature>/`.
 - **Search Components**: Use `shadcn/ui` Popover + Command for searchable dropdowns.
 - **Folder Structure**: Keep admin components organized by feature.
+- **Dialog State**: When using Dialogs for editing, ensure local state is reset when the dialog opens (use `useEffect` dependent on `open` state or a key) to avoid showing stale data.
 
 ### Shadcn UI & Icons
 - **Installation**: If a component is missing, install it using `bunx --bun shadcn@latest add <component-name>`.
