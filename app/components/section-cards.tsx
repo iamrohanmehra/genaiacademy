@@ -1,7 +1,6 @@
 import * as React from "react"
 import {
   IconCalendar,
-  IconClock,
   IconCurrencyDollar,
   IconSchool,
   IconTrendingUp,
@@ -94,68 +93,20 @@ export function SectionCards() {
     enabled: true,
   })
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = React.useCallback((amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount / 100)
-  }
+  }, [])
 
-  const renderTrendIcon = (trend: string) => {
-    if (trend === 'up') return <IconTrendingUp className="mr-1 h-3 w-3" />
-    if (trend === 'down') return <IconTrendingDown className="mr-1 h-3 w-3" />
-    return <IconMinus className="mr-1 h-3 w-3" />
-  }
-
-  const renderMetricCard = (title: string, metric: Metric | undefined, icon: React.ReactNode, formatter: (val: number) => string = (val) => val.toString(), description: string) => {
-    if (isLoading || !metric) {
-      return (
-        <Card className="@container/card">
-          <CardHeader>
-            <CardDescription><Skeleton className="h-4 w-24" /></CardDescription>
-            <CardTitle><Skeleton className="h-8 w-16" /></CardTitle>
-          </CardHeader>
-          <CardFooter>
-            <Skeleton className="h-4 w-full" />
-          </CardFooter>
-        </Card>
-      )
-    }
-
-    return (
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>{title}</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {formatter(metric.current)}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className={cn(
-              metric.trend === 'up' ? "text-green-600 border-green-200 bg-green-50" :
-                metric.trend === 'down' ? "text-red-600 border-red-200 bg-red-50" :
-                  "text-gray-600 border-gray-200 bg-gray-50"
-            )}>
-              {renderTrendIcon(metric.trend)}
-              {metric.changePercentage > 0 ? '+' : ''}{metric.changePercentage.toFixed(1)}%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            {metric.trend === 'up' ? 'Trending up' : metric.trend === 'down' ? 'Trending down' : 'Stable'} {icon}
-          </div>
-          <div className="text-muted-foreground">
-            {description}
-          </div>
-        </CardFooter>
-      </Card>
-    )
-  }
+  const iconUserPlus = React.useMemo(() => <IconUserPlus className="size-4" />, [])
+  const iconSchool = React.useMemo(() => <IconSchool className="size-4" />, [])
+  const iconCurrencyDollar = React.useMemo(() => <IconCurrencyDollar className="size-4" />, [])
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between px-4 lg:px-6">
-        <h2 className="text-lg font-semibold">Overview</h2>
+      <div className="flex items-center justify-end px-4 lg:px-6">
         <div className="flex items-center gap-2">
           <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger className="w-[160px]">
@@ -216,12 +167,102 @@ export function SectionCards() {
         </div>
       </div>
 
-      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-        {renderMetricCard("New Signups", overviewData?.userSignups, <IconUserPlus className="size-4" />, undefined, "Total signups for selected period")}
-        {renderMetricCard("Total Enrollments", overviewData?.totalEnrollments, <IconSchool className="size-4" />, undefined, "Students enrolled in courses")}
-        {renderMetricCard("Paid Enrollments", overviewData?.paidEnrollments, <IconSchool className="size-4" />, undefined, "Enrollments with payment")}
-        {renderMetricCard("Revenue", overviewData?.totalRevenue, <IconCurrencyDollar className="size-4" />, formatCurrency, "Gross revenue from all sources")}
+      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 md:grid-cols-4">
+        <MetricCard
+          title="New Signups"
+          metric={overviewData?.userSignups}
+          icon={iconUserPlus}
+          description="Total signups for selected period"
+          isLoading={isLoading}
+        />
+        <MetricCard
+          title="Total Enrollments"
+          metric={overviewData?.totalEnrollments}
+          icon={iconSchool}
+          description="Students enrolled in courses"
+          isLoading={isLoading}
+        />
+        <MetricCard
+          title="Paid Enrollments"
+          metric={overviewData?.paidEnrollments}
+          icon={iconSchool}
+          description="Enrollments with payment"
+          isLoading={isLoading}
+        />
+        <MetricCard
+          title="Revenue"
+          metric={overviewData?.totalRevenue}
+          icon={<IconCurrencyDollar className="size-4" />}
+          description="Gross revenue from all sources"
+          formatter={formatCurrency}
+          isLoading={isLoading}
+        />
       </div>
     </div>
   )
 }
+
+const MetricCard = React.memo(function MetricCard({
+  title,
+  metric,
+  icon,
+  formatter = (val: number) => val.toString(),
+  description,
+  isLoading
+}: {
+  title: string
+  metric: Metric | undefined
+  icon: React.ReactNode
+  formatter?: (val: number) => string
+  description: string
+  isLoading: boolean
+}) {
+  const renderTrendIcon = (trend: string) => {
+    if (trend === 'up') return <IconTrendingUp className="mr-1 h-3 w-3" />
+    if (trend === 'down') return <IconTrendingDown className="mr-1 h-3 w-3" />
+    return <IconMinus className="mr-1 h-3 w-3" />
+  }
+
+  if (isLoading || !metric) {
+    return (
+      <Card className="@container/card h-[220px] flex flex-col justify-between">
+        <CardHeader>
+          <CardDescription><Skeleton className="h-4 w-24" /></CardDescription>
+          <CardTitle><Skeleton className="h-8 w-16" /></CardTitle>
+        </CardHeader>
+        <CardFooter>
+          <Skeleton className="h-4 w-full" />
+        </CardFooter>
+      </Card>
+    )
+  }
+
+  return (
+    <Card className="@container/card h-[220px] flex flex-col justify-between">
+      <CardHeader>
+        <CardDescription>{title}</CardDescription>
+        <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+          {formatter(metric.current)}
+        </CardTitle>
+        <CardAction>
+          <Badge variant="outline" className={cn(
+            metric.trend === 'up' ? "text-green-600 border-green-200 bg-green-50" :
+              metric.trend === 'down' ? "text-red-600 border-red-200 bg-red-50" :
+                "text-gray-600 border-gray-200 bg-gray-50"
+          )}>
+            {renderTrendIcon(metric.trend)}
+            {metric.changePercentage > 0 ? '+' : ''}{metric.changePercentage.toFixed(1)}%
+          </Badge>
+        </CardAction>
+      </CardHeader>
+      <CardFooter className="flex-col items-start gap-1.5 text-sm">
+        <div className="line-clamp-1 flex gap-2 font-medium">
+          {metric.trend === 'up' ? 'Trending up' : metric.trend === 'down' ? 'Trending down' : 'Stable'} {icon}
+        </div>
+        <div className="text-muted-foreground">
+          {description}
+        </div>
+      </CardFooter>
+    </Card>
+  )
+})

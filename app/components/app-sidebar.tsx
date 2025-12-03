@@ -1,172 +1,232 @@
 "use client"
 
 import * as React from "react"
-import { useQuery } from "@tanstack/react-query"
 import {
   BookOpen,
-  Bot,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
+  Command,
+  GraduationCap,
+  LayoutDashboard,
+  PlusCircle,
   Settings2,
-  SquareTerminal,
+  Users,
+  LogOut,
 } from "lucide-react"
 
-import { queryKeys } from "~/lib/query-keys"
 import { NavMain } from "~/components/nav-main"
-import { NavProjects } from "~/components/nav-projects"
-import { NavUser } from "~/components/nav-user"
+import { NavSecondary } from "~/components/nav-secondary"
+import { TeamSwitcher } from "~/components/team-switcher"
+import { SidebarSearch } from "~/components/sidebar-search"
+import { useNavigate } from "react-router"
+import { toast } from "sonner"
+import { supabase } from "~/lib/supabase"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarRail,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
 } from "~/components/ui/sidebar"
-import { supabase } from "~/lib/supabase"
 
 // This is sample data.
 const data = {
-  user: {
-    name: "Admin User",
-    email: "admin@genaiacademy.com",
-    avatar: "https://github.com/shadcn.png",
-  },
   teams: [
     {
       name: "GenAI Academy",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      logo: Command,
+      plan: "Admin",
     },
   ],
   navMain: [
     {
       title: "Dashboard",
       url: "/admin/dashboard",
-      icon: SquareTerminal,
+      icon: LayoutDashboard,
+      isActive: true,
     },
     {
       title: "Courses",
       url: "/admin/courses",
-      icon: Bot,
-      items: [
-        {
-          title: "All Courses",
-          url: "/admin/courses",
-        },
-        {
-          title: "Create Course",
-          url: "/admin/courses/create",
-        },
-        {
-          title: "Active Courses",
-          url: "/admin/courses/active",
-        },
-      ],
+      icon: BookOpen,
+    },
+    {
+      title: "New Course",
+      url: "/admin/courses/create",
+      icon: PlusCircle,
+    },
+    {
+      title: "Enrollment",
+      url: "/admin/enrollments/create",
+      icon: GraduationCap,
     },
     {
       title: "Users",
       url: "/admin/users",
-      icon: BookOpen,
-      items: [
-        {
-          title: "All Users",
-          url: "/admin/users",
-        },
-        {
-          title: "Create User",
-          url: "/admin/users/create",
-        },
-        {
-          title: "Enrollments",
-          url: "/admin/enrollments",
-        },
-        {
-          title: "Performance",
-          url: "/admin/users/performance",
-        },
-      ],
+      icon: Users,
     },
     {
-      title: "Settings",
-      url: "/admin/settings",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "/admin/settings",
-        },
-        {
-          title: "Users",
-          url: "/admin/settings/users",
-        },
-        {
-          title: "Billing",
-          url: "/admin/settings/billing",
-        },
-      ],
+      title: "New User",
+      url: "/admin/users/create",
+      icon: PlusCircle,
     },
   ],
-  projects: [
+  navSecondary: [
     {
-      name: "Reports",
-      url: "/admin/reports",
-      icon: PieChart,
+      title: "Settings",
+      url: "#",
+      icon: Settings2,
+    },
+  ],
+  workspaces: [
+    {
+      name: "Personal Life Management",
+      emoji: "🏠",
+      pages: [
+        {
+          name: "Daily Journal & Reflection",
+          url: "#",
+          emoji: "📔",
+        },
+        {
+          name: "Health & Wellness Tracker",
+          url: "#",
+          emoji: "🍏",
+        },
+        {
+          name: "Personal Growth & Learning Goals",
+          url: "#",
+          emoji: "🌟",
+        },
+      ],
     },
     {
-      name: "Resources",
-      url: "/admin/resources",
-      icon: Map,
+      name: "Professional Development",
+      emoji: "💼",
+      pages: [
+        {
+          name: "Career Objectives & Milestones",
+          url: "#",
+          emoji: "🎯",
+        },
+        {
+          name: "Skill Acquisition & Training Log",
+          url: "#",
+          emoji: "🧠",
+        },
+        {
+          name: "Networking Contacts & Events",
+          url: "#",
+          emoji: "🤝",
+        },
+      ],
+    },
+    {
+      name: "Creative Projects",
+      emoji: "🎨",
+      pages: [
+        {
+          name: "Writing Ideas & Story Outlines",
+          url: "#",
+          emoji: "✍️",
+        },
+        {
+          name: "Art & Design Portfolio",
+          url: "#",
+          emoji: "🖼️",
+        },
+        {
+          name: "Music Composition & Practice Log",
+          url: "#",
+          emoji: "🎵",
+        },
+      ],
+    },
+    {
+      name: "Home Management",
+      emoji: "🏡",
+      pages: [
+        {
+          name: "Household Budget & Expense Tracking",
+          url: "#",
+          emoji: "💰",
+        },
+        {
+          name: "Home Maintenance Schedule & Tasks",
+          url: "#",
+          emoji: "🔧",
+        },
+        {
+          name: "Family Calendar & Event Planning",
+          url: "#",
+          emoji: "📅",
+        },
+      ],
+    },
+    {
+      name: "Travel & Adventure",
+      emoji: "🧳",
+      pages: [
+        {
+          name: "Trip Planning & Itineraries",
+          url: "#",
+          emoji: "🗺️",
+        },
+        {
+          name: "Travel Bucket List & Inspiration",
+          url: "#",
+          emoji: "🌎",
+        },
+        {
+          name: "Travel Journal & Photo Gallery",
+          url: "#",
+          emoji: "📸",
+        },
+      ],
     },
   ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: userData } = useQuery({
-    queryKey: queryKeys.session,
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        return {
-          name: session.user.user_metadata.full_name || session.user.email?.split('@')[0] || "User",
-          email: session.user.email || "",
-          avatar: session.user.user_metadata.avatar_url || "https://github.com/shadcn.png",
-        }
-      }
-      return data.user
-    },
-  })
+  const navigate = useNavigate()
 
-  const user = userData
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+
+      if (error) {
+        toast.error("Failed to logout")
+        console.error(error)
+      } else {
+        toast.success("Logged out successfully")
+        navigate("/login")
+      }
+    } catch (error) {
+      toast.error("An error occurred during logout")
+      console.error(error)
+    }
+  }
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
+        <TeamSwitcher teams={data.teams} />
+        <SidebarSearch />
+        <NavMain items={data.navMain} />
+      </SidebarHeader>
+      <SidebarContent>
+        <NavSecondary items={data.navSecondary} className="mt-auto" />
+      </SidebarContent>
+      <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="/admin/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <GalleryVerticalEnd className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">GenAI Academy</span>
-                  <span className="truncate text-xs">Admin Console</span>
-                </div>
-              </a>
+            <SidebarMenuButton onClick={handleLogout}>
+              <LogOut />
+              <span>Log out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
-      </SidebarContent>
-      <SidebarFooter>
-        {user && <NavUser user={user} />}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

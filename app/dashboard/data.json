@@ -1,137 +1,802 @@
 [
   {
     "id": 1,
-    "header": "GenAI Fundamentals - Batch A",
-    "type": "Live Cohort",
-    "status": "In Progress",
-    "target": "45",
-    "limit": "50",
-    "reviewer": "Dr. Sarah Chen"
+    "name": "Bob Brown",
+    "email": "bob.brown1@example.com",
+    "course": "AI Ethics & Safety",
+    "price": "$599",
+    "campaign": "Winter 2024"
   },
   {
     "id": 2,
-    "header": "LLM Engineering - Batch B",
-    "type": "Live Cohort",
-    "status": "Not Started",
-    "target": "20",
-    "limit": "40",
-    "reviewer": "Alex Rivera"
+    "name": "George Martinez",
+    "email": "george.martinez2@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$599",
+    "campaign": "Summer Sale"
   },
   {
     "id": 3,
-    "header": "Prompt Engineering Pro",
-    "type": "Self-Paced",
-    "status": "Done",
-    "target": "120",
-    "limit": "Unlimited",
-    "reviewer": "Maya Johnson"
+    "name": "Alice Davis",
+    "email": "alice.davis3@example.com",
+    "course": "Advanced RAG Systems",
+    "price": "$999",
+    "campaign": "Q1 Promo"
   },
   {
     "id": 4,
-    "header": "Advanced RAG Systems",
-    "type": "Workshop",
-    "status": "In Progress",
-    "target": "28",
-    "limit": "30",
-    "reviewer": "Dr. Sarah Chen"
+    "name": "Hannah Thompson",
+    "email": "hannah.thompson4@example.com",
+    "course": "NLP Masterclass",
+    "price": "$499",
+    "campaign": "Summer Sale"
   },
   {
     "id": 5,
-    "header": "AI Ethics & Safety",
-    "type": "Self-Paced",
-    "status": "Done",
-    "target": "85",
-    "limit": "Unlimited",
-    "reviewer": "James Wilson"
+    "name": "Quinn Anderson",
+    "email": "quinn.anderson5@example.com",
+    "course": "Computer Vision",
+    "price": "$299",
+    "campaign": "Summer Sale"
   },
   {
     "id": 6,
-    "header": "GenAI for Business Leaders",
-    "type": "Executive",
-    "status": "In Progress",
-    "target": "15",
-    "limit": "15",
-    "reviewer": "Elena Rodriguez"
+    "name": "Zack Davis",
+    "email": "zack.davis6@example.com",
+    "course": "LLM Engineering",
+    "price": "$199",
+    "campaign": "Fall 2024"
   },
   {
     "id": 7,
-    "header": "Computer Vision with Transformers",
-    "type": "Live Cohort",
-    "status": "Not Started",
-    "target": "12",
-    "limit": "35",
-    "reviewer": "David Kim"
+    "name": "Yara Taylor",
+    "email": "yara.taylor7@example.com",
+    "course": "Generative Art & Design",
+    "price": "$199",
+    "campaign": "Fall 2024"
   },
   {
     "id": 8,
-    "header": "NLP Masterclass",
-    "type": "Live Cohort",
-    "status": "Done",
-    "target": "48",
-    "limit": "50",
-    "reviewer": "Alex Rivera"
+    "name": "Yara Robinson",
+    "email": "yara.robinson8@example.com",
+    "course": "Prompt Engineering Pro",
+    "price": "$199",
+    "campaign": "Fall 2024"
   },
   {
     "id": 9,
-    "header": "Generative Art & Design",
-    "type": "Workshop",
-    "status": "In Progress",
-    "target": "22",
-    "limit": "25",
-    "reviewer": "Maya Johnson"
+    "name": "Rachel Wright",
+    "email": "rachel.wright9@example.com",
+    "course": "NLP Masterclass",
+    "price": "$799",
+    "campaign": "Spring 2025"
   },
   {
     "id": 10,
-    "header": "AI Agents Development",
-    "type": "Live Cohort",
-    "status": "Not Started",
-    "target": "30",
-    "limit": "40",
-    "reviewer": "Dr. Sarah Chen"
+    "name": "Victor Martinez",
+    "email": "victor.martinez10@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$599",
+    "campaign": "Winter 2024"
   },
   {
     "id": 11,
-    "header": "Fine-tuning LLMs",
-    "type": "Workshop",
-    "status": "Done",
-    "target": "25",
-    "limit": "25",
-    "reviewer": "Alex Rivera"
+    "name": "Zack Thompson",
+    "email": "zack.thompson11@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$599",
+    "campaign": "Spring 2025"
   },
   {
     "id": 12,
-    "header": "Vector Databases Deep Dive",
-    "type": "Self-Paced",
-    "status": "In Progress",
-    "target": "65",
-    "limit": "Unlimited",
-    "reviewer": "David Kim"
+    "name": "Hannah Anderson",
+    "email": "hannah.anderson12@example.com",
+    "course": "AI Ethics & Safety",
+    "price": "$599",
+    "campaign": "New Year Special"
   },
   {
     "id": 13,
-    "header": "Multi-Modal AI Systems",
-    "type": "Live Cohort",
-    "status": "In Progress",
-    "target": "38",
-    "limit": "45",
-    "reviewer": "Elena Rodriguez"
+    "name": "Tina White",
+    "email": "tina.white13@example.com",
+    "course": "Prompt Engineering Pro",
+    "price": "$799",
+    "campaign": "Q1 Promo"
   },
   {
     "id": 14,
-    "header": "AI Product Management",
-    "type": "Executive",
-    "status": "Done",
-    "target": "18",
-    "limit": "20",
-    "reviewer": "James Wilson"
+    "name": "Ursula Thomas",
+    "email": "ursula.thomas14@example.com",
+    "course": "AI Ethics & Safety",
+    "price": "$299",
+    "campaign": "Early Bird"
   },
   {
     "id": 15,
-    "header": "LangChain & LlamaIndex",
-    "type": "Workshop",
-    "status": "Not Started",
-    "target": "15",
-    "limit": "30",
-    "reviewer": "Maya Johnson"
+    "name": "Charlie Harris",
+    "email": "charlie.harris15@example.com",
+    "course": "Generative Art & Design",
+    "price": "$999",
+    "campaign": "Winter 2024"
+  },
+  {
+    "id": 16,
+    "name": "Kevin Brown",
+    "email": "kevin.brown16@example.com",
+    "course": "GenAI Fundamentals",
+    "price": "$499",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 17,
+    "name": "Peter Wright",
+    "email": "peter.wright17@example.com",
+    "course": "AI Agents Development",
+    "price": "$499",
+    "campaign": "Summer Sale"
+  },
+  {
+    "id": 18,
+    "name": "Liam Wright",
+    "email": "liam.wright18@example.com",
+    "course": "Generative Art & Design",
+    "price": "$499",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 19,
+    "name": "Ian Miller",
+    "email": "ian.miller19@example.com",
+    "course": "Advanced RAG Systems",
+    "price": "$799",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 20,
+    "name": "Xander White",
+    "email": "xander.white20@example.com",
+    "course": "Advanced RAG Systems",
+    "price": "$299",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 21,
+    "name": "Rachel Harris",
+    "email": "rachel.harris21@example.com",
+    "course": "Computer Vision",
+    "price": "$299",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 22,
+    "name": "Kevin Harris",
+    "email": "kevin.harris22@example.com",
+    "course": "Computer Vision",
+    "price": "$299",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 23,
+    "name": "Victor Johnson",
+    "email": "victor.johnson23@example.com",
+    "course": "Computer Vision",
+    "price": "$499",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 24,
+    "name": "Fiona Harris",
+    "email": "fiona.harris24@example.com",
+    "course": "Generative Art & Design",
+    "price": "$499",
+    "campaign": "Summer Sale"
+  },
+  {
+    "id": 25,
+    "name": "Quinn Johnson",
+    "email": "quinn.johnson25@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$499",
+    "campaign": "Winter 2024"
+  },
+  {
+    "id": 26,
+    "name": "George Johnson",
+    "email": "george.johnson26@example.com",
+    "course": "AI Agents Development",
+    "price": "$299",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 27,
+    "name": "Ian Jackson",
+    "email": "ian.jackson27@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$299",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 28,
+    "name": "Alice Taylor",
+    "email": "alice.taylor28@example.com",
+    "course": "LLM Engineering",
+    "price": "$799",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 29,
+    "name": "Kevin White",
+    "email": "kevin.white29@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$999",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 30,
+    "name": "Diana Prince",
+    "email": "diana.prince30@example.com",
+    "course": "Fine-tuning LLMs",
+    "price": "$499",
+    "campaign": "Summer Sale"
+  },
+  {
+    "id": 31,
+    "name": "Charlie Taylor",
+    "email": "charlie.taylor31@example.com",
+    "course": "Generative Art & Design",
+    "price": "$299",
+    "campaign": "Early Bird"
+  },
+  {
+    "id": 32,
+    "name": "Alice Thompson",
+    "email": "alice.thompson32@example.com",
+    "course": "AI Agents Development",
+    "price": "$599",
+    "campaign": "Summer Sale"
+  },
+  {
+    "id": 33,
+    "name": "Olivia Wilson",
+    "email": "olivia.wilson33@example.com",
+    "course": "LLM Engineering",
+    "price": "$199",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 34,
+    "name": "Peter Johnson",
+    "email": "peter.johnson34@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$999",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 35,
+    "name": "Fiona Prince",
+    "email": "fiona.prince35@example.com",
+    "course": "LLM Engineering",
+    "price": "$599",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 36,
+    "name": "Yara Anderson",
+    "email": "yara.anderson36@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$999",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 37,
+    "name": "Olivia Moore",
+    "email": "olivia.moore37@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$799",
+    "campaign": "Winter 2024"
+  },
+  {
+    "id": 38,
+    "name": "Tina Thomas",
+    "email": "tina.thomas38@example.com",
+    "course": "NLP Masterclass",
+    "price": "$299",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 39,
+    "name": "Victor Brown",
+    "email": "victor.brown39@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$499",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 40,
+    "name": "Charlie Martinez",
+    "email": "charlie.martinez40@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$299",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 41,
+    "name": "Zack Jackson",
+    "email": "zack.jackson41@example.com",
+    "course": "NLP Masterclass",
+    "price": "$499",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 42,
+    "name": "Hannah Smith",
+    "email": "hannah.smith42@example.com",
+    "course": "Advanced RAG Systems",
+    "price": "$199",
+    "campaign": "Early Bird"
+  },
+  {
+    "id": 43,
+    "name": "Olivia Brown",
+    "email": "olivia.brown43@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$799",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 44,
+    "name": "Diana Wright",
+    "email": "diana.wright44@example.com",
+    "course": "Computer Vision",
+    "price": "$199",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 45,
+    "name": "Charlie Jackson",
+    "email": "charlie.jackson45@example.com",
+    "course": "Advanced RAG Systems",
+    "price": "$799",
+    "campaign": "Winter 2024"
+  },
+  {
+    "id": 46,
+    "name": "Ursula Davis",
+    "email": "ursula.davis46@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$799",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 47,
+    "name": "Liam Garcia",
+    "email": "liam.garcia47@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$199",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 48,
+    "name": "Mia Moore",
+    "email": "mia.moore48@example.com",
+    "course": "Computer Vision",
+    "price": "$299",
+    "campaign": "Early Bird"
+  },
+  {
+    "id": 49,
+    "name": "Ian Miller",
+    "email": "ian.miller49@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$799",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 50,
+    "name": "Yara Martinez",
+    "email": "yara.martinez50@example.com",
+    "course": "Generative Art & Design",
+    "price": "$799",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 51,
+    "name": "Evan White",
+    "email": "evan.white51@example.com",
+    "course": "Generative Art & Design",
+    "price": "$499",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 52,
+    "name": "Olivia Harris",
+    "email": "olivia.harris52@example.com",
+    "course": "Advanced RAG Systems",
+    "price": "$799",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 53,
+    "name": "Peter Taylor",
+    "email": "peter.taylor53@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$299",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 54,
+    "name": "Rachel Johnson",
+    "email": "rachel.johnson54@example.com",
+    "course": "AI Agents Development",
+    "price": "$299",
+    "campaign": "Early Bird"
+  },
+  {
+    "id": 55,
+    "name": "George Miller",
+    "email": "george.miller55@example.com",
+    "course": "AI Ethics & Safety",
+    "price": "$799",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 56,
+    "name": "Bob Prince",
+    "email": "bob.prince56@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$999",
+    "campaign": "Summer Sale"
+  },
+  {
+    "id": 57,
+    "name": "Bob White",
+    "email": "bob.white57@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$299",
+    "campaign": "Summer Sale"
+  },
+  {
+    "id": 58,
+    "name": "Ursula Taylor",
+    "email": "ursula.taylor58@example.com",
+    "course": "Fine-tuning LLMs",
+    "price": "$499",
+    "campaign": "Winter 2024"
+  },
+  {
+    "id": 59,
+    "name": "Wendy Garcia",
+    "email": "wendy.garcia59@example.com",
+    "course": "Generative Art & Design",
+    "price": "$499",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 60,
+    "name": "Noah Martinez",
+    "email": "noah.martinez60@example.com",
+    "course": "AI Ethics & Safety",
+    "price": "$499",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 61,
+    "name": "Bob Wilson",
+    "email": "bob.wilson61@example.com",
+    "course": "Generative Art & Design",
+    "price": "$499",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 62,
+    "name": "George Wilson",
+    "email": "george.wilson62@example.com",
+    "course": "Fine-tuning LLMs",
+    "price": "$799",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 63,
+    "name": "Hannah Smith",
+    "email": "hannah.smith63@example.com",
+    "course": "GenAI Fundamentals",
+    "price": "$299",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 64,
+    "name": "Mia Harris",
+    "email": "mia.harris64@example.com",
+    "course": "AI Ethics & Safety",
+    "price": "$999",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 65,
+    "name": "Victor Moore",
+    "email": "victor.moore65@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$499",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 66,
+    "name": "Rachel Thomas",
+    "email": "rachel.thomas66@example.com",
+    "course": "GenAI Fundamentals",
+    "price": "$199",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 67,
+    "name": "Olivia Brown",
+    "email": "olivia.brown67@example.com",
+    "course": "Prompt Engineering Pro",
+    "price": "$499",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 68,
+    "name": "Rachel Thompson",
+    "email": "rachel.thompson68@example.com",
+    "course": "Prompt Engineering Pro",
+    "price": "$599",
+    "campaign": "Early Bird"
+  },
+  {
+    "id": 69,
+    "name": "Noah Martinez",
+    "email": "noah.martinez69@example.com",
+    "course": "NLP Masterclass",
+    "price": "$599",
+    "campaign": "Summer Sale"
+  },
+  {
+    "id": 70,
+    "name": "Charlie Jackson",
+    "email": "charlie.jackson70@example.com",
+    "course": "Prompt Engineering Pro",
+    "price": "$499",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 71,
+    "name": "Diana Garcia",
+    "email": "diana.garcia71@example.com",
+    "course": "AI Ethics & Safety",
+    "price": "$999",
+    "campaign": "Winter 2024"
+  },
+  {
+    "id": 72,
+    "name": "Zack Anderson",
+    "email": "zack.anderson72@example.com",
+    "course": "AI Ethics & Safety",
+    "price": "$199",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 73,
+    "name": "Julia Thomas",
+    "email": "julia.thomas73@example.com",
+    "course": "Fine-tuning LLMs",
+    "price": "$499",
+    "campaign": "Winter 2024"
+  },
+  {
+    "id": 74,
+    "name": "Noah Anderson",
+    "email": "noah.anderson74@example.com",
+    "course": "GenAI Fundamentals",
+    "price": "$799",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 75,
+    "name": "Bob Wilson",
+    "email": "bob.wilson75@example.com",
+    "course": "Advanced RAG Systems",
+    "price": "$999",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 76,
+    "name": "Fiona Brown",
+    "email": "fiona.brown76@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$599",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 77,
+    "name": "Noah White",
+    "email": "noah.white77@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$499",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 78,
+    "name": "Rachel Prince",
+    "email": "rachel.prince78@example.com",
+    "course": "Advanced RAG Systems",
+    "price": "$199",
+    "campaign": "Summer Sale"
+  },
+  {
+    "id": 79,
+    "name": "Yara Taylor",
+    "email": "yara.taylor79@example.com",
+    "course": "Prompt Engineering Pro",
+    "price": "$599",
+    "campaign": "Summer Sale"
+  },
+  {
+    "id": 80,
+    "name": "Wendy Smith",
+    "email": "wendy.smith80@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$499",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 81,
+    "name": "Olivia Smith",
+    "email": "olivia.smith81@example.com",
+    "course": "Prompt Engineering Pro",
+    "price": "$999",
+    "campaign": "Early Bird"
+  },
+  {
+    "id": 82,
+    "name": "Tina Martinez",
+    "email": "tina.martinez82@example.com",
+    "course": "LLM Engineering",
+    "price": "$999",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 83,
+    "name": "Bob Prince",
+    "email": "bob.prince83@example.com",
+    "course": "Generative Art & Design",
+    "price": "$499",
+    "campaign": "Early Bird"
+  },
+  {
+    "id": 84,
+    "name": "Alice Garcia",
+    "email": "alice.garcia84@example.com",
+    "course": "Computer Vision",
+    "price": "$299",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 85,
+    "name": "Kevin Taylor",
+    "email": "kevin.taylor85@example.com",
+    "course": "Computer Vision",
+    "price": "$199",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 86,
+    "name": "George Thompson",
+    "email": "george.thompson86@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$199",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 87,
+    "name": "Kevin Harris",
+    "email": "kevin.harris87@example.com",
+    "course": "GenAI Fundamentals",
+    "price": "$999",
+    "campaign": "Winter 2024"
+  },
+  {
+    "id": 88,
+    "name": "Olivia Harris",
+    "email": "olivia.harris88@example.com",
+    "course": "Computer Vision",
+    "price": "$199",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 89,
+    "name": "Rachel Robinson",
+    "email": "rachel.robinson89@example.com",
+    "course": "Prompt Engineering Pro",
+    "price": "$999",
+    "campaign": "Early Bird"
+  },
+  {
+    "id": 90,
+    "name": "Ursula Johnson",
+    "email": "ursula.johnson90@example.com",
+    "course": "Fine-tuning LLMs",
+    "price": "$599",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 91,
+    "name": "Charlie Harris",
+    "email": "charlie.harris91@example.com",
+    "course": "Prompt Engineering Pro",
+    "price": "$199",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 92,
+    "name": "Hannah Thomas",
+    "email": "hannah.thomas92@example.com",
+    "course": "Fine-tuning LLMs",
+    "price": "$299",
+    "campaign": "Q1 Promo"
+  },
+  {
+    "id": 93,
+    "name": "Victor Martinez",
+    "email": "victor.martinez93@example.com",
+    "course": "AI Agents Development",
+    "price": "$599",
+    "campaign": "Fall 2024"
+  },
+  {
+    "id": 94,
+    "name": "Kevin Anderson",
+    "email": "kevin.anderson94@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$799",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 95,
+    "name": "Kevin Prince",
+    "email": "kevin.prince95@example.com",
+    "course": "GenAI Fundamentals",
+    "price": "$299",
+    "campaign": "Winter 2024"
+  },
+  {
+    "id": 96,
+    "name": "Charlie Wilson",
+    "email": "charlie.wilson96@example.com",
+    "course": "AI Agents Development",
+    "price": "$599",
+    "campaign": "Black Friday"
+  },
+  {
+    "id": 97,
+    "name": "Quinn Harris",
+    "email": "quinn.harris97@example.com",
+    "course": "Fine-tuning LLMs",
+    "price": "$199",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 98,
+    "name": "Tina Moore",
+    "email": "tina.moore98@example.com",
+    "course": "NLP Masterclass",
+    "price": "$799",
+    "campaign": "New Year Special"
+  },
+  {
+    "id": 99,
+    "name": "Diana Wright",
+    "email": "diana.wright99@example.com",
+    "course": "Vector Databases Deep Dive",
+    "price": "$799",
+    "campaign": "Spring 2025"
+  },
+  {
+    "id": 100,
+    "name": "Sam Garcia",
+    "email": "sam.garcia100@example.com",
+    "course": "Multi-Modal AI Systems",
+    "price": "$499",
+    "campaign": "Q1 Promo"
   }
 ]

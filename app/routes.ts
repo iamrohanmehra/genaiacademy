@@ -1,4 +1,5 @@
 import { type RouteConfig, index, route, layout } from "@react-router/dev/routes";
+// Trigger rebuild - fixed settings route loading
 
 export default [
     index("routes/home.tsx"),
@@ -8,6 +9,7 @@ export default [
     // Admin Routes with Persistent Layout
     layout("routes/admin/layout.tsx", [
         route("admin/dashboard", "routes/admin/dashboard.tsx"),
+        // Settings route removed as per request
         route("admin/users", "routes/admin/users.tsx"),
         route("admin/users/create", "routes/admin/users/create.tsx"),
         route("admin/users/:id", "routes/admin/users-details.tsx"),
