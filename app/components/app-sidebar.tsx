@@ -14,7 +14,6 @@ import {
 
 import { NavMain } from "~/components/nav-main"
 import { NavSecondary } from "~/components/nav-secondary"
-import { TeamSwitcher } from "~/components/team-switcher"
 import { SidebarSearch } from "~/components/sidebar-search"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
@@ -211,7 +210,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="w-fit px-1.5 hover:bg-transparent hover:text-inherit">
+              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-5 items-center justify-center rounded-md">
+                <Command className="size-3" />
+              </div>
+              <span className="truncate font-medium">GenAI Academy</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <SidebarSearch />
         <NavMain items={data.navMain} />
       </SidebarHeader>

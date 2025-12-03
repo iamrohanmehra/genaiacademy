@@ -26,11 +26,12 @@ import { cn } from "~/lib/utils"
 
 export function SidebarSearch() {
     const [open, setOpen] = React.useState(false)
+    const [query, setQuery] = React.useState("")
     const navigate = useNavigate()
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
-            if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+            if (e.key === "s" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault()
                 setOpen((open) => !open)
             }
@@ -45,6 +46,14 @@ export function SidebarSearch() {
         command()
     }, [])
 
+    const handleSearch = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter" && query.trim()) {
+            setOpen(false)
+            navigate(`/admin/search?q=${encodeURIComponent(query.trim())}`)
+            setQuery("")
+        }
+    }
+
     return (
         <>
             <Button
@@ -58,11 +67,16 @@ export function SidebarSearch() {
                 <span className="hidden lg:inline-flex">Search...</span>
                 <span className="inline-flex lg:hidden">Search...</span>
                 <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-                    <span className="text-xs">⌘</span>K
+                    <span className="text-xs">⌘</span>S
                 </kbd>
             </Button>
             <CommandDialog open={open} onOpenChange={setOpen}>
-                <CommandInput placeholder="Type a command or search..." />
+                <CommandInput
+                    placeholder="Type a command or search..."
+                    value={query}
+                    onValueChange={setQuery}
+                    onKeyDown={handleSearch}
+                />
                 <CommandList>
                     <CommandEmpty>No results found.</CommandEmpty>
                     <CommandGroup heading="Pages">

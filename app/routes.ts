@@ -11,6 +11,7 @@ export default [
         route("admin/dashboard", "routes/admin/dashboard.tsx"),
         // Settings route removed as per request
         route("admin/users", "routes/admin/users.tsx"),
+        route("admin/search", "routes/admin/search.tsx"),
         route("admin/users/create", "routes/admin/users/create.tsx"),
         route("admin/users/:id", "routes/admin/users-details.tsx"),
         route("admin/enrollments", "routes/admin/enrollments.tsx"),

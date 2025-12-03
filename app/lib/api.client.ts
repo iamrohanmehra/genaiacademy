@@ -105,6 +105,11 @@ export class ApiClient {
     async updateContentProgress(enrollmentId: string, contentId: string, data: any, token?: string): Promise<{ success: boolean; data: ProgressDetail }> {
         return this.post<{ success: boolean; data: ProgressDetail }>(`/api/admin/enrollments/${enrollmentId}/content/${contentId}/progress`, data, token);
     }
+
+    // Users
+    async searchUsers(query: string, token?: string): Promise<{ success: boolean; data: any[] }> {
+        return this.get<{ success: boolean; data: any[] }>(`/api/admin/users/search?q=${encodeURIComponent(query)}`, token);
+    }
 }
 
 export const api = new ApiClient()

@@ -263,7 +263,7 @@ export default function UsersPage() {
     const [page, setPage] = React.useState(1)
     const [searchQuery, setSearchQuery] = React.useState("")
     const debouncedSearch = useDebounce(searchQuery, 300)
-    const limit = 100
+    const limit = 50
 
     // Reset to page 1 if search query changes
     React.useEffect(() => {

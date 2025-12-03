@@ -4,7 +4,7 @@
     "name": "Bob Brown",
     "email": "bob.brown1@example.com",
     "course": "AI Ethics & Safety",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Winter 2024"
   },
   {
@@ -12,7 +12,7 @@
     "name": "George Martinez",
     "email": "george.martinez2@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Summer Sale"
   },
   {
@@ -20,7 +20,7 @@
     "name": "Alice Davis",
     "email": "alice.davis3@example.com",
     "course": "Advanced RAG Systems",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Q1 Promo"
   },
   {
@@ -28,7 +28,7 @@
     "name": "Hannah Thompson",
     "email": "hannah.thompson4@example.com",
     "course": "NLP Masterclass",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Summer Sale"
   },
   {
@@ -36,7 +36,7 @@
     "name": "Quinn Anderson",
     "email": "quinn.anderson5@example.com",
     "course": "Computer Vision",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Summer Sale"
   },
   {
@@ -44,7 +44,7 @@
     "name": "Zack Davis",
     "email": "zack.davis6@example.com",
     "course": "LLM Engineering",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Fall 2024"
   },
   {
@@ -52,7 +52,7 @@
     "name": "Yara Taylor",
     "email": "yara.taylor7@example.com",
     "course": "Generative Art & Design",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Fall 2024"
   },
   {
@@ -60,7 +60,7 @@
     "name": "Yara Robinson",
     "email": "yara.robinson8@example.com",
     "course": "Prompt Engineering Pro",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Fall 2024"
   },
   {
@@ -68,7 +68,7 @@
     "name": "Rachel Wright",
     "email": "rachel.wright9@example.com",
     "course": "NLP Masterclass",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Spring 2025"
   },
   {
@@ -76,7 +76,7 @@
     "name": "Victor Martinez",
     "email": "victor.martinez10@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Winter 2024"
   },
   {
@@ -84,7 +84,7 @@
     "name": "Zack Thompson",
     "email": "zack.thompson11@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Spring 2025"
   },
   {
@@ -92,7 +92,7 @@
     "name": "Hannah Anderson",
     "email": "hannah.anderson12@example.com",
     "course": "AI Ethics & Safety",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "New Year Special"
   },
   {
@@ -100,7 +100,7 @@
     "name": "Tina White",
     "email": "tina.white13@example.com",
     "course": "Prompt Engineering Pro",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Q1 Promo"
   },
   {
@@ -108,7 +108,7 @@
     "name": "Ursula Thomas",
     "email": "ursula.thomas14@example.com",
     "course": "AI Ethics & Safety",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Early Bird"
   },
   {
@@ -116,7 +116,7 @@
     "name": "Charlie Harris",
     "email": "charlie.harris15@example.com",
     "course": "Generative Art & Design",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Winter 2024"
   },
   {
@@ -124,7 +124,7 @@
     "name": "Kevin Brown",
     "email": "kevin.brown16@example.com",
     "course": "GenAI Fundamentals",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Spring 2025"
   },
   {
@@ -132,7 +132,7 @@
     "name": "Peter Wright",
     "email": "peter.wright17@example.com",
     "course": "AI Agents Development",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Summer Sale"
   },
   {
@@ -140,7 +140,7 @@
     "name": "Liam Wright",
     "email": "liam.wright18@example.com",
     "course": "Generative Art & Design",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Q1 Promo"
   },
   {
@@ -148,7 +148,7 @@
     "name": "Ian Miller",
     "email": "ian.miller19@example.com",
     "course": "Advanced RAG Systems",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Fall 2024"
   },
   {
@@ -156,7 +156,7 @@
     "name": "Xander White",
     "email": "xander.white20@example.com",
     "course": "Advanced RAG Systems",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Spring 2025"
   },
   {
@@ -164,7 +164,7 @@
     "name": "Rachel Harris",
     "email": "rachel.harris21@example.com",
     "course": "Computer Vision",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Spring 2025"
   },
   {
@@ -172,7 +172,7 @@
     "name": "Kevin Harris",
     "email": "kevin.harris22@example.com",
     "course": "Computer Vision",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Q1 Promo"
   },
   {
@@ -180,7 +180,7 @@
     "name": "Victor Johnson",
     "email": "victor.johnson23@example.com",
     "course": "Computer Vision",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Fall 2024"
   },
   {
@@ -188,7 +188,7 @@
     "name": "Fiona Harris",
     "email": "fiona.harris24@example.com",
     "course": "Generative Art & Design",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Summer Sale"
   },
   {
@@ -196,7 +196,7 @@
     "name": "Quinn Johnson",
     "email": "quinn.johnson25@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Winter 2024"
   },
   {
@@ -204,7 +204,7 @@
     "name": "George Johnson",
     "email": "george.johnson26@example.com",
     "course": "AI Agents Development",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "New Year Special"
   },
   {
@@ -212,7 +212,7 @@
     "name": "Ian Jackson",
     "email": "ian.jackson27@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Q1 Promo"
   },
   {
@@ -220,7 +220,7 @@
     "name": "Alice Taylor",
     "email": "alice.taylor28@example.com",
     "course": "LLM Engineering",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Q1 Promo"
   },
   {
@@ -228,7 +228,7 @@
     "name": "Kevin White",
     "email": "kevin.white29@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Black Friday"
   },
   {
@@ -236,7 +236,7 @@
     "name": "Diana Prince",
     "email": "diana.prince30@example.com",
     "course": "Fine-tuning LLMs",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Summer Sale"
   },
   {
@@ -244,7 +244,7 @@
     "name": "Charlie Taylor",
     "email": "charlie.taylor31@example.com",
     "course": "Generative Art & Design",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Early Bird"
   },
   {
@@ -252,7 +252,7 @@
     "name": "Alice Thompson",
     "email": "alice.thompson32@example.com",
     "course": "AI Agents Development",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Summer Sale"
   },
   {
@@ -260,7 +260,7 @@
     "name": "Olivia Wilson",
     "email": "olivia.wilson33@example.com",
     "course": "LLM Engineering",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Q1 Promo"
   },
   {
@@ -268,7 +268,7 @@
     "name": "Peter Johnson",
     "email": "peter.johnson34@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Fall 2024"
   },
   {
@@ -276,7 +276,7 @@
     "name": "Fiona Prince",
     "email": "fiona.prince35@example.com",
     "course": "LLM Engineering",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "New Year Special"
   },
   {
@@ -284,7 +284,7 @@
     "name": "Yara Anderson",
     "email": "yara.anderson36@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Q1 Promo"
   },
   {
@@ -292,7 +292,7 @@
     "name": "Olivia Moore",
     "email": "olivia.moore37@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Winter 2024"
   },
   {
@@ -300,7 +300,7 @@
     "name": "Tina Thomas",
     "email": "tina.thomas38@example.com",
     "course": "NLP Masterclass",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Black Friday"
   },
   {
@@ -308,7 +308,7 @@
     "name": "Victor Brown",
     "email": "victor.brown39@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Spring 2025"
   },
   {
@@ -316,7 +316,7 @@
     "name": "Charlie Martinez",
     "email": "charlie.martinez40@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Q1 Promo"
   },
   {
@@ -324,7 +324,7 @@
     "name": "Zack Jackson",
     "email": "zack.jackson41@example.com",
     "course": "NLP Masterclass",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Black Friday"
   },
   {
@@ -332,7 +332,7 @@
     "name": "Hannah Smith",
     "email": "hannah.smith42@example.com",
     "course": "Advanced RAG Systems",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Early Bird"
   },
   {
@@ -340,7 +340,7 @@
     "name": "Olivia Brown",
     "email": "olivia.brown43@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Fall 2024"
   },
   {
@@ -348,7 +348,7 @@
     "name": "Diana Wright",
     "email": "diana.wright44@example.com",
     "course": "Computer Vision",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Spring 2025"
   },
   {
@@ -356,7 +356,7 @@
     "name": "Charlie Jackson",
     "email": "charlie.jackson45@example.com",
     "course": "Advanced RAG Systems",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Winter 2024"
   },
   {
@@ -364,7 +364,7 @@
     "name": "Ursula Davis",
     "email": "ursula.davis46@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Q1 Promo"
   },
   {
@@ -372,7 +372,7 @@
     "name": "Liam Garcia",
     "email": "liam.garcia47@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Q1 Promo"
   },
   {
@@ -380,7 +380,7 @@
     "name": "Mia Moore",
     "email": "mia.moore48@example.com",
     "course": "Computer Vision",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Early Bird"
   },
   {
@@ -388,7 +388,7 @@
     "name": "Ian Miller",
     "email": "ian.miller49@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Black Friday"
   },
   {
@@ -396,7 +396,7 @@
     "name": "Yara Martinez",
     "email": "yara.martinez50@example.com",
     "course": "Generative Art & Design",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "New Year Special"
   },
   {
@@ -404,7 +404,7 @@
     "name": "Evan White",
     "email": "evan.white51@example.com",
     "course": "Generative Art & Design",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Fall 2024"
   },
   {
@@ -412,7 +412,7 @@
     "name": "Olivia Harris",
     "email": "olivia.harris52@example.com",
     "course": "Advanced RAG Systems",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Black Friday"
   },
   {
@@ -420,7 +420,7 @@
     "name": "Peter Taylor",
     "email": "peter.taylor53@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "New Year Special"
   },
   {
@@ -428,7 +428,7 @@
     "name": "Rachel Johnson",
     "email": "rachel.johnson54@example.com",
     "course": "AI Agents Development",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Early Bird"
   },
   {
@@ -436,7 +436,7 @@
     "name": "George Miller",
     "email": "george.miller55@example.com",
     "course": "AI Ethics & Safety",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Spring 2025"
   },
   {
@@ -444,7 +444,7 @@
     "name": "Bob Prince",
     "email": "bob.prince56@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Summer Sale"
   },
   {
@@ -452,7 +452,7 @@
     "name": "Bob White",
     "email": "bob.white57@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Summer Sale"
   },
   {
@@ -460,7 +460,7 @@
     "name": "Ursula Taylor",
     "email": "ursula.taylor58@example.com",
     "course": "Fine-tuning LLMs",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Winter 2024"
   },
   {
@@ -468,7 +468,7 @@
     "name": "Wendy Garcia",
     "email": "wendy.garcia59@example.com",
     "course": "Generative Art & Design",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Fall 2024"
   },
   {
@@ -476,7 +476,7 @@
     "name": "Noah Martinez",
     "email": "noah.martinez60@example.com",
     "course": "AI Ethics & Safety",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "New Year Special"
   },
   {
@@ -484,7 +484,7 @@
     "name": "Bob Wilson",
     "email": "bob.wilson61@example.com",
     "course": "Generative Art & Design",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Black Friday"
   },
   {
@@ -492,7 +492,7 @@
     "name": "George Wilson",
     "email": "george.wilson62@example.com",
     "course": "Fine-tuning LLMs",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Spring 2025"
   },
   {
@@ -500,7 +500,7 @@
     "name": "Hannah Smith",
     "email": "hannah.smith63@example.com",
     "course": "GenAI Fundamentals",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "New Year Special"
   },
   {
@@ -508,7 +508,7 @@
     "name": "Mia Harris",
     "email": "mia.harris64@example.com",
     "course": "AI Ethics & Safety",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "New Year Special"
   },
   {
@@ -516,7 +516,7 @@
     "name": "Victor Moore",
     "email": "victor.moore65@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Q1 Promo"
   },
   {
@@ -524,7 +524,7 @@
     "name": "Rachel Thomas",
     "email": "rachel.thomas66@example.com",
     "course": "GenAI Fundamentals",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Q1 Promo"
   },
   {
@@ -532,7 +532,7 @@
     "name": "Olivia Brown",
     "email": "olivia.brown67@example.com",
     "course": "Prompt Engineering Pro",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Black Friday"
   },
   {
@@ -540,7 +540,7 @@
     "name": "Rachel Thompson",
     "email": "rachel.thompson68@example.com",
     "course": "Prompt Engineering Pro",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Early Bird"
   },
   {
@@ -548,7 +548,7 @@
     "name": "Noah Martinez",
     "email": "noah.martinez69@example.com",
     "course": "NLP Masterclass",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Summer Sale"
   },
   {
@@ -556,7 +556,7 @@
     "name": "Charlie Jackson",
     "email": "charlie.jackson70@example.com",
     "course": "Prompt Engineering Pro",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "New Year Special"
   },
   {
@@ -564,7 +564,7 @@
     "name": "Diana Garcia",
     "email": "diana.garcia71@example.com",
     "course": "AI Ethics & Safety",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Winter 2024"
   },
   {
@@ -572,7 +572,7 @@
     "name": "Zack Anderson",
     "email": "zack.anderson72@example.com",
     "course": "AI Ethics & Safety",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Spring 2025"
   },
   {
@@ -580,7 +580,7 @@
     "name": "Julia Thomas",
     "email": "julia.thomas73@example.com",
     "course": "Fine-tuning LLMs",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Winter 2024"
   },
   {
@@ -588,7 +588,7 @@
     "name": "Noah Anderson",
     "email": "noah.anderson74@example.com",
     "course": "GenAI Fundamentals",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Fall 2024"
   },
   {
@@ -596,7 +596,7 @@
     "name": "Bob Wilson",
     "email": "bob.wilson75@example.com",
     "course": "Advanced RAG Systems",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Spring 2025"
   },
   {
@@ -604,7 +604,7 @@
     "name": "Fiona Brown",
     "email": "fiona.brown76@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Fall 2024"
   },
   {
@@ -612,7 +612,7 @@
     "name": "Noah White",
     "email": "noah.white77@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Fall 2024"
   },
   {
@@ -620,7 +620,7 @@
     "name": "Rachel Prince",
     "email": "rachel.prince78@example.com",
     "course": "Advanced RAG Systems",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Summer Sale"
   },
   {
@@ -628,7 +628,7 @@
     "name": "Yara Taylor",
     "email": "yara.taylor79@example.com",
     "course": "Prompt Engineering Pro",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Summer Sale"
   },
   {
@@ -636,7 +636,7 @@
     "name": "Wendy Smith",
     "email": "wendy.smith80@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Spring 2025"
   },
   {
@@ -644,7 +644,7 @@
     "name": "Olivia Smith",
     "email": "olivia.smith81@example.com",
     "course": "Prompt Engineering Pro",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Early Bird"
   },
   {
@@ -652,7 +652,7 @@
     "name": "Tina Martinez",
     "email": "tina.martinez82@example.com",
     "course": "LLM Engineering",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Black Friday"
   },
   {
@@ -660,7 +660,7 @@
     "name": "Bob Prince",
     "email": "bob.prince83@example.com",
     "course": "Generative Art & Design",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Early Bird"
   },
   {
@@ -668,7 +668,7 @@
     "name": "Alice Garcia",
     "email": "alice.garcia84@example.com",
     "course": "Computer Vision",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Black Friday"
   },
   {
@@ -676,7 +676,7 @@
     "name": "Kevin Taylor",
     "email": "kevin.taylor85@example.com",
     "course": "Computer Vision",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "New Year Special"
   },
   {
@@ -684,7 +684,7 @@
     "name": "George Thompson",
     "email": "george.thompson86@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Fall 2024"
   },
   {
@@ -692,7 +692,7 @@
     "name": "Kevin Harris",
     "email": "kevin.harris87@example.com",
     "course": "GenAI Fundamentals",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Winter 2024"
   },
   {
@@ -700,7 +700,7 @@
     "name": "Olivia Harris",
     "email": "olivia.harris88@example.com",
     "course": "Computer Vision",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Fall 2024"
   },
   {
@@ -708,7 +708,7 @@
     "name": "Rachel Robinson",
     "email": "rachel.robinson89@example.com",
     "course": "Prompt Engineering Pro",
-    "price": "$999",
+    "price": "₹999",
     "campaign": "Early Bird"
   },
   {
@@ -716,7 +716,7 @@
     "name": "Ursula Johnson",
     "email": "ursula.johnson90@example.com",
     "course": "Fine-tuning LLMs",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Fall 2024"
   },
   {
@@ -724,7 +724,7 @@
     "name": "Charlie Harris",
     "email": "charlie.harris91@example.com",
     "course": "Prompt Engineering Pro",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "Spring 2025"
   },
   {
@@ -732,7 +732,7 @@
     "name": "Hannah Thomas",
     "email": "hannah.thomas92@example.com",
     "course": "Fine-tuning LLMs",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Q1 Promo"
   },
   {
@@ -740,7 +740,7 @@
     "name": "Victor Martinez",
     "email": "victor.martinez93@example.com",
     "course": "AI Agents Development",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Fall 2024"
   },
   {
@@ -748,7 +748,7 @@
     "name": "Kevin Anderson",
     "email": "kevin.anderson94@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Black Friday"
   },
   {
@@ -756,7 +756,7 @@
     "name": "Kevin Prince",
     "email": "kevin.prince95@example.com",
     "course": "GenAI Fundamentals",
-    "price": "$299",
+    "price": "₹299",
     "campaign": "Winter 2024"
   },
   {
@@ -764,7 +764,7 @@
     "name": "Charlie Wilson",
     "email": "charlie.wilson96@example.com",
     "course": "AI Agents Development",
-    "price": "$599",
+    "price": "₹599",
     "campaign": "Black Friday"
   },
   {
@@ -772,7 +772,7 @@
     "name": "Quinn Harris",
     "email": "quinn.harris97@example.com",
     "course": "Fine-tuning LLMs",
-    "price": "$199",
+    "price": "₹199",
     "campaign": "New Year Special"
   },
   {
@@ -780,7 +780,7 @@
     "name": "Tina Moore",
     "email": "tina.moore98@example.com",
     "course": "NLP Masterclass",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "New Year Special"
   },
   {
@@ -788,7 +788,7 @@
     "name": "Diana Wright",
     "email": "diana.wright99@example.com",
     "course": "Vector Databases Deep Dive",
-    "price": "$799",
+    "price": "₹799",
     "campaign": "Spring 2025"
   },
   {
@@ -796,7 +796,7 @@
     "name": "Sam Garcia",
     "email": "sam.garcia100@example.com",
     "course": "Multi-Modal AI Systems",
-    "price": "$499",
+    "price": "₹499",
     "campaign": "Q1 Promo"
   }
 ]
