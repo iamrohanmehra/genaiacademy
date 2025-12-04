@@ -15,6 +15,7 @@
       "routes/signup": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/dashboard": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/users": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/search": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/users/create": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/users-details": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/enrollments": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
@@ -81,6 +82,15 @@
         "parentId": "routes/admin/layout",
         "file": "app/routes/admin/users.tsx",
         "path": "admin/users",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/admin/search": {
+        "id": "routes/admin/search",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/search.tsx",
+        "path": "admin/search",
         "config": {
           "runtime": "nodejs"
         }
@@ -238,6 +248,12 @@
         "file": "routes/admin/users.tsx",
         "path": "admin/users"
       },
+      "routes/admin/search": {
+        "id": "routes/admin/search",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/search.tsx",
+        "path": "admin/search"
+      },
       "routes/admin/users/create": {
         "id": "routes/admin/users/create",
         "parentId": "routes/admin/layout",
@@ -340,6 +356,10 @@
               {
                 "file": "routes/admin/users.tsx",
                 "path": "admin/users"
+              },
+              {
+                "file": "routes/admin/search.tsx",
+                "path": "admin/search"
               },
               {
                 "file": "routes/admin/users/create.tsx",

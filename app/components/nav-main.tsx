@@ -1,4 +1,5 @@
 import { type LucideIcon } from "lucide-react"
+import { useLocation, Link } from "react-router"
 
 import {
   SidebarMenu,
@@ -16,18 +17,23 @@ export function NavMain({
     isActive?: boolean
   }[]
 }) {
+  const location = useLocation()
+
   return (
     <SidebarMenu>
-      {items.map((item) => (
-        <SidebarMenuItem key={item.title}>
-          <SidebarMenuButton asChild isActive={item.isActive}>
-            <a href={item.url}>
-              <item.icon />
-              <span>{item.title}</span>
-            </a>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
+      {items.map((item) => {
+        const isActive = location.pathname.startsWith(item.url)
+        return (
+          <SidebarMenuItem key={item.title}>
+            <SidebarMenuButton asChild isActive={isActive}>
+              <Link to={item.url}>
+                <item.icon />
+                <span>{item.title}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        )
+      })}
     </SidebarMenu>
   )
 }

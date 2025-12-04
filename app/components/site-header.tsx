@@ -52,7 +52,7 @@ export function SiteHeader() {
         </Breadcrumb>
       </div>
       <div className="ml-auto px-3">
-        <NavActions />
+        {location.pathname !== "/admin/courses" && <NavActions />}
       </div>
     </header>
   )

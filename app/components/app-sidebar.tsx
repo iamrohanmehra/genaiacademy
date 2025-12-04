@@ -43,7 +43,6 @@ const data = {
       title: "Dashboard",
       url: "/admin/dashboard",
       icon: LayoutDashboard,
-      isActive: true,
     },
     {
       title: "Courses",
