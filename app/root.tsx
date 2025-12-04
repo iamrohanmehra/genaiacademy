@@ -41,6 +41,7 @@ import { useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "~/lib/query-client";
 import { supabase } from "~/lib/supabase";
+import { ThemeProvider } from "~/components/theme-provider";
 
 export default function App() {
   useEffect(() => {
@@ -56,9 +57,11 @@ export default function App() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 
