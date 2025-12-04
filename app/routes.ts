@@ -22,6 +22,7 @@ export default [
 
         route("admin/courses/:id/edit", "routes/admin/courses/edit.tsx"),
         route("admin/courses/:id/content", "routes/admin/course-content.tsx"),
+        route("admin/courses/:id/schedule", "routes/admin/courses/schedule.tsx"),
     ]),
 
     route("debug-token", "routes/debug-token.tsx"),

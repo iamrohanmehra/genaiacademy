@@ -80,7 +80,7 @@ const CourseActions = React.memo(({ course }: { course: Course }) => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                            <Link to={`/admin/courses/${course.id}/edit`}>
+                            <Link to={`/admin/courses/${course.id}/schedule`}>
                                 <Calendar className="h-4 w-4" />
                                 <span className="sr-only">Schedule</span>
                             </Link>
