@@ -27,7 +27,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   customLogger: logger,
   build: {
-    sourcemap: !isSsrBuild,
+    sourcemap: false,
     rollupOptions: {
       output: isSsrBuild ? undefined : {
         manualChunks: {
