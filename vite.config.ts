@@ -1,7 +1,21 @@
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig } from "vite";
+import { defineConfig, createLogger } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+
+const logger = createLogger();
+const originalWarn = logger.warn;
+const originalError = logger.error;
+
+logger.warn = (msg, options) => {
+  if (msg.includes('Error when using sourcemap for reporting an error')) return;
+  originalWarn(msg, options);
+};
+
+logger.error = (msg, options) => {
+  if (msg.includes('Error when using sourcemap for reporting an error')) return;
+  originalError(msg, options);
+};
 
 export default defineConfig(({ isSsrBuild }) => ({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
@@ -11,8 +25,9 @@ export default defineConfig(({ isSsrBuild }) => ({
   esbuild: {
     drop: ['console', 'debugger'],
   },
+  customLogger: logger,
   build: {
-    sourcemap: false,
+    sourcemap: !isSsrBuild,
     rollupOptions: {
       output: isSsrBuild ? undefined : {
         manualChunks: {

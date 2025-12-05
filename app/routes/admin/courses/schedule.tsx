@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, Suspense, lazy } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -21,12 +21,16 @@ import {
 import { Input } from "~/components/ui/input"
 import { Checkbox } from "~/components/ui/checkbox"
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover"
-import { Calendar } from "~/components/ui/calendar"
+// Static import removed
+// import { Calendar } from "~/components/ui/calendar"
 import { cn } from "~/lib/utils"
 import { api } from "~/lib/api.client"
 import { queryKeys } from "~/lib/query-keys"
 import { supabase } from "~/lib/supabase"
 import type { Course } from "../courses"
+
+// Lazy load Calendar
+const Calendar = lazy(() => import("~/components/ui/calendar").then(module => ({ default: module.Calendar })))
 
 const scheduleSchema = z.object({
     nextClassTopic: z.string().min(1, "Topic is required"),
@@ -74,35 +78,12 @@ export default function CourseSchedulePage() {
         if (course) {
             form.reset({
                 nextClassTopic: course.nextClassTopic || "",
-                // Assuming nextClassLink maps to meetingLink for now, or we need a new field?
-                // The user asked for "Meeting Link / User Video HLS", which might map to `nextClassLink` or `resourcesLink`?
-                // Let's assume `nextClassLink` is the meeting link.
                 meetingLink: course.nextClassLink || "",
-                // screenVideoLink might be new or map to something else. I'll check the Course type.
-                // Course type has `resourcesLink`. Maybe that's it? Or maybe I need to add it to the type?
-                // The user request implies these are fields to update.
-                // For now I'll map screenVideoLink to resourcesLink if that makes sense, or just keep it as a form field that might not save if the backend doesn't support it yet.
-                // Wait, the user said "Update Schedule".
-                // Let's assume `nextClassLink` -> Meeting Link.
-                // `resourcesLink` -> Screen Video HLS? Or maybe `desc`?
-                // Actually, looking at the Course type in `courses.tsx`:
-                // nextClassTopic, nextClassLink, nextClassDesc.
-                // I'll map meetingLink to nextClassLink.
-                // I'll map screenVideoLink to resourcesLink for now, or leave it if it's not in the type.
-                // Wait, the Course type has `resourcesLink`.
                 screenVideoLink: course.resourcesLink || "",
-
-                // Date handling
-                // The course has `schedule` (string) and `startDate`/`endDate`.
-                // The user wants "Next Class Schedule (date & time)".
-                // This might be a new field or stored in `schedule` or `nextClassDesc`?
-                // Let's assume we store the date in `schedule` or just use a local state for the payload if the backend expects it differently.
-                // For now, I'll try to parse `course.schedule` if it's a date, otherwise default to today.
                 nextClassDate: (() => {
                     const date = course.schedule ? new Date(course.schedule) : new Date()
                     return isNaN(date.getTime()) ? new Date() : date
                 })(),
-
                 notifyWhatsApp: false,
                 notifyEmail: false,
             })
@@ -115,19 +96,11 @@ export default function CourseSchedulePage() {
             const token = session?.access_token
             if (!token) throw new Error("Unauthorized")
 
-            // Construct payload
-            // We need to map form values to the API expected payload.
-            // Since I don't see the API definition for "Update Schedule", I'll assume it uses the generic Update Course endpoint or a specific one.
-            // I'll use the Update Course endpoint: PUT /api/admin/courses/:id
-
             const payload = {
                 nextClassTopic: values.nextClassTopic,
                 nextClassLink: values.meetingLink,
-                resourcesLink: values.screenVideoLink, // Mapping screen video to resources link as best guess
-                schedule: values.nextClassDate.toISOString(), // Storing date in schedule field
-                // Notification flags might need to be handled by a separate API call or part of this payload if the backend supports it.
-                // If the backend sends notifications on update, these flags might be query params or body fields.
-                // I'll add them to the body.
+                resourcesLink: values.screenVideoLink,
+                schedule: values.nextClassDate.toISOString(),
                 notifyWhatsApp: values.notifyWhatsApp,
                 notifyEmail: values.notifyEmail,
             }
@@ -138,7 +111,6 @@ export default function CourseSchedulePage() {
             toast.success("Schedule updated successfully")
             queryClient.invalidateQueries({ queryKey: queryKeys.courses.detail(id!) })
             queryClient.invalidateQueries({ queryKey: queryKeys.courses.all })
-            // navigate("/admin/courses") // Optional: stay on page or go back? User didn't specify. Stay on page is better for "Update".
         },
         onError: (error: any) => {
             toast.error(error.message || "Failed to update schedule")
@@ -166,7 +138,6 @@ export default function CourseSchedulePage() {
             <div className="flex flex-col gap-2">
                 <h1 className="text-3xl font-bold tracking-tight">{course.title}</h1>
                 <div className="flex flex-col gap-1">
-                    {/* Removed "Update Schedule" subtitle as requested */}
                     <p className="text-muted-foreground">Manage upcoming class details and notifications for this course.</p>
                 </div>
 
@@ -231,15 +202,17 @@ export default function CourseSchedulePage() {
                                             </FormControl>
                                         </PopoverTrigger>
                                         <PopoverContent className="w-auto p-0" align="start">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value as Date}
-                                                onSelect={field.onChange}
-                                                disabled={(date) =>
-                                                    date < new Date(new Date().setHours(0, 0, 0, 0))
-                                                }
-                                                initialFocus
-                                            />
+                                            <Suspense fallback={<div className="p-4 flex justify-center"><Loader2 className="h-4 w-4 animate-spin" /></div>}>
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value as Date}
+                                                    onSelect={field.onChange}
+                                                    disabled={(date) =>
+                                                        date < new Date(new Date().setHours(0, 0, 0, 0))
+                                                    }
+                                                    initialFocus
+                                                />
+                                            </Suspense>
                                             <div className="p-3 border-t">
                                                 <Input
                                                     type="time"
