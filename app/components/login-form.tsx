@@ -6,6 +6,7 @@ import { toast } from "sonner"
 import { cn } from "~/lib/utils"
 import { supabase } from "~/lib/supabase"
 import { Button } from "~/components/ui/button"
+import { api } from "~/lib/api.client"
 import {
     Card,
     CardContent,
@@ -36,31 +37,11 @@ export function LoginForm({
         setLoading(true)
 
         try {
-            const apiUrl = import.meta.env.VITE_API_URL
-
-            if (!apiUrl) {
-                toast.error("API URL not configured")
-                setLoading(false)
-                return
-            }
-
             // Call Backend Login API
-            const response = await fetch(`${apiUrl}/api/auth/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email,
-                    password
-                })
+            const responseData = await api.post<any>('/api/auth/login', {
+                email,
+                password
             })
-
-            const responseData = await response.json()
-
-            if (!response.ok) {
-                throw new Error(responseData.error || 'Login failed')
-            }
 
             const { user, session } = responseData.data
 
@@ -98,6 +79,7 @@ export function LoginForm({
 
         } catch (error) {
             console.error('Login error:', error)
+            // ApiError has a message property, so this works fine
             toast.error(error instanceof Error ? error.message : "An error occurred during login")
         } finally {
             setLoading(false)

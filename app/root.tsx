@@ -20,7 +20,7 @@ export const meta: Route.MetaFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -47,7 +47,12 @@ export default function App() {
   useEffect(() => {
     const checkSession = async () => {
       const { error } = await supabase.auth.getUser();
-      if (error && (error.status === 403 || error.message.includes("invalid JWT"))) {
+      if (
+        error &&
+        (error.status === 403 || error.message.includes("invalid JWT")) &&
+        !window.location.pathname.startsWith("/login") &&
+        !window.location.pathname.startsWith("/signup")
+      ) {
         console.warn("Detected invalid session, signing out...");
         await supabase.auth.signOut();
         window.location.href = "/login";
