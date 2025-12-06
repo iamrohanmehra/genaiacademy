@@ -15,7 +15,7 @@ import {
     useReactTable,
 } from "@tanstack/react-table"
 import { useQuery, keepPreviousData, useQueryClient } from "@tanstack/react-query"
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Loader2, ChevronLeft, ChevronRight, Calendar, Users, BookOpen, Pencil } from "lucide-react"
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Loader2, ChevronLeft, ChevronRight, Calendar, Users, BookOpen, Pencil, Copy } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
 
@@ -162,12 +162,28 @@ export const columns: ColumnDef<Course>[] = [
             )
         },
         cell: ({ row }) => (
-            <Link
-                to={`/admin/courses/${row.original.id}/edit`}
-                className="hover:underline font-medium text-primary pl-4 block"
-            >
-                {row.getValue("title")}
-            </Link>
+            <div className="flex items-center gap-2 pl-4">
+                <Link
+                    to={`/admin/courses/${row.original.id}/edit`}
+                    className="hover:underline font-medium text-primary"
+                >
+                    {row.getValue("title")}
+                </Link>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-4 w-4 text-muted-foreground hover:text-foreground"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        navigator.clipboard.writeText(row.original.id)
+                        toast.success("Course ID copied")
+                    }}
+                >
+                    <Copy className="h-3 w-3" />
+                    <span className="sr-only">Copy Course ID</span>
+                </Button>
+            </div>
         ),
     },
     {

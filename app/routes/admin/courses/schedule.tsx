@@ -134,7 +134,7 @@ export default function CourseSchedulePage() {
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-8 p-8 max-w-3xl mx-auto w-full">
+        <div className="flex flex-1 flex-col gap-8 p-8 max-w-xl mx-auto w-full">
             <div className="flex flex-col gap-2">
                 <h1 className="text-3xl font-bold tracking-tight">{course.title}</h1>
                 <div className="flex flex-col gap-1">
@@ -301,14 +301,12 @@ export default function CourseSchedulePage() {
                             />
                         </div>
 
-                        <div className="flex justify-end">
-                            <Button type="submit" disabled={updateScheduleMutation.isPending}>
-                                {updateScheduleMutation.isPending && (
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                )}
-                                Update Schedule
-                            </Button>
-                        </div>
+                        <Button type="submit" disabled={updateScheduleMutation.isPending} className="w-full">
+                            {updateScheduleMutation.isPending && (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            )}
+                            Update Schedule
+                        </Button>
                     </form>
                 </Form>
             </div>

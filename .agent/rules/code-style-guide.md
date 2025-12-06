@@ -83,6 +83,14 @@ This is a **STRICTLY FRONTEND** repository.
 - **Folder Structure**: Keep admin components organized by feature.
 - **Dialog State**: When using Dialogs for editing, ensure local state is reset when the dialog opens (use `useEffect` dependent on `open` state or a key) to avoid showing stale data.
 
+### UI Patterns & Best Practices
+- **Forms**:
+    - **Compact Layouts**: For settings or single-column forms, constrain width (e.g., `max-w-xl`) to prevent overly wide inputs on large screens.
+    - **Buttons**: In compact forms, use **Full Width** buttons (`w-full`) for the primary submit action to match the input width and create a solid visual block.
+    - **Checkboxes**:
+        - **Vertical**: Default choice for long lists or varying label lengths.
+        - **Side-by-Side**: Preferred for pairs of short labels (e.g., "Notify Email", "Notify WhatsApp") in compact forms to save vertical space.
+
 ### Shadcn UI & Icons
 - **Installation**: If a component is missing, install it using `bunx --bun shadcn@latest add <component-name>`.
 - **Icons**: Use `lucide-react` for all icons.
