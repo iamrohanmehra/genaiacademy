@@ -64,13 +64,18 @@ export interface CreateEnrollmentPayload {
 }
 
 export interface UpdateEnrollmentPayload {
+    courseId?: string;
     hasPaid?: boolean;
     amountPaid?: number;
     paidAt?: string;
     transactionId?: string;
+    invoiceId?: string;
+    paymentMethod?: string;
     progress?: number;
     certificateId?: string;
     certificateGeneratedAt?: string;
+    accessOnDate?: string;
+    accessTillDate?: string;
 }
 
 export interface ProgressDetail {

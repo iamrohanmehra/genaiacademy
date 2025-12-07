@@ -27,7 +27,7 @@ import { cn } from "~/lib/utils"
 import { api } from "~/lib/api.client"
 import { queryKeys } from "~/lib/query-keys"
 import { supabase } from "~/lib/supabase"
-import type { Course } from "../courses"
+import type { Course } from "~/types/course"
 
 // Lazy load Calendar
 const Calendar = lazy(() => import("~/components/ui/calendar").then(module => ({ default: module.Calendar })))

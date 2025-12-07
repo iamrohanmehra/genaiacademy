@@ -74,8 +74,9 @@ export class ApiClient {
 
     // Enrollments
     // Enrollments
-    async getEnrollments(token?: string): Promise<EnrollmentsResponse> {
-        return this.get<EnrollmentsResponse>("/api/admin/enrollments", token);
+    async getEnrollments(token?: string, courseId?: string): Promise<EnrollmentsResponse> {
+        const query = courseId ? `?courseId=${courseId}` : '';
+        return this.get<EnrollmentsResponse>(`/api/admin/enrollments${query}`, token);
     }
 
     async getEnrollmentById(id: string, token?: string): Promise<{ success: boolean; data: Enrollment }> {
@@ -106,7 +107,16 @@ export class ApiClient {
         return this.post<{ success: boolean; data: ProgressDetail }>(`/api/admin/enrollments/${enrollmentId}/content/${contentId}/progress`, data, token);
     }
 
+    // Courses
+    async getCourseById(id: string, token?: string): Promise<{ success: boolean; data: any }> {
+        return this.get<{ success: boolean; data: any }>(`/api/admin/courses/${id}`, token);
+    }
+
     // Users
+    async getUserById(id: string, token?: string): Promise<{ success: boolean; data: any }> {
+        return this.get<{ success: boolean; data: any }>(`/api/admin/users/${id}`, token);
+    }
+
     async searchUsers(query: string, token?: string): Promise<{ success: boolean; data: any[] }> {
         return this.get<{ success: boolean; data: any[] }>(`/api/admin/users/search?q=${encodeURIComponent(query)}`, token);
     }

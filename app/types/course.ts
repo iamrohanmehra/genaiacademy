@@ -1,31 +1,24 @@
-export interface CourseSection {
+export type Course = {
     id: string
-    courseId: string
     title: string
-    order: number
+    desc: string
+    schedule: string
+    type: string
+    topic: number
+    price: string
+    payable: string
+    certificateFee: string
+    association: string
+    limit: number
+    banner: string
+    startDate: string
+    endDate: string
+    whatsAppGroupLink: string
+    resourcesLink: string
+    nextClassTopic: string
+    nextClassLink: string
+    nextClassDesc: string
+    status: "live" | "private" | "completed" | "inProgress"
     createdAt: string
     updatedAt: string
-}
-
-export interface CourseContent {
-    id: string
-    courseId: string
-    sectionId: string
-    title: string
-    desc?: string
-    type: 'video' | 'liveClass' | 'assignment' | 'article'
-    videoLink?: string
-    order: number
-    xp: number
-    accessOn?: number
-    accessTill?: number
-    accessOnDate?: string
-    accessTillDate?: string
-    createdAt: string
-    updatedAt: string
-}
-
-export interface SortOrderPayload {
-    type: 'section' | 'content'
-    sortedOrder: { id: string; order: number }[]
 }

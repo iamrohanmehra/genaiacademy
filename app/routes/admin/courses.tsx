@@ -47,31 +47,7 @@ import { useDebounce } from "~/hooks/use-debounce"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "~/components/ui/tooltip"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 
-// Define Course Type
-export type Course = {
-    id: string
-    title: string
-    desc: string
-    schedule: string
-    type: string
-    topic: number
-    price: string
-    payable: string
-    certificateFee: string
-    association: string
-    limit: number
-    banner: string
-    startDate: string
-    endDate: string
-    whatsAppGroupLink: string
-    resourcesLink: string
-    nextClassTopic: string
-    nextClassLink: string
-    nextClassDesc: string
-    status: "live" | "private" | "completed" | "inProgress"
-    createdAt: string
-    updatedAt: string
-}
+import type { Course } from "~/types/course"
 
 const CourseActions = React.memo(({ course }: { course: Course }) => {
     return (

@@ -18,6 +18,7 @@ export const queryKeys = {
     },
     enrollments: {
         all: ['enrollments'] as const,
+        list: (courseId: string) => ['enrollments', 'list', courseId] as const,
         detail: (id: string) => [...queryKeys.enrollments.all, id] as const,
         progress: (id: string) => [...queryKeys.enrollments.detail(id), 'progress'] as const,
     },

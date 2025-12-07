@@ -21,6 +21,7 @@
       "routes/admin/enrollments": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/enrollments/create": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/enrollment-details": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/admin/enrollments/edit": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/courses": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/courses/create": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/courses/edit": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
@@ -141,6 +142,15 @@
           "runtime": "nodejs"
         }
       },
+      "routes/admin/enrollments/edit": {
+        "id": "routes/admin/enrollments/edit",
+        "parentId": "routes/admin/layout",
+        "file": "app/routes/admin/enrollments/edit.tsx",
+        "path": "admin/enrollments/:id/edit",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
       "routes/admin/courses": {
         "id": "routes/admin/courses",
         "parentId": "routes/admin/layout",
@@ -211,11 +221,11 @@
     "basename": "/",
     "buildDirectory": "/Users/himanshu/Documents/genaiacademy/build",
     "future": {
-      "v8_middleware": false,
       "unstable_optimizeDeps": false,
-      "unstable_splitRouteModules": false,
       "unstable_subResourceIntegrity": false,
-      "unstable_viteEnvironmentApi": false
+      "v8_middleware": false,
+      "v8_splitRouteModules": false,
+      "v8_viteEnvironmentApi": false
     },
     "routes": {
       "root": {
@@ -293,6 +303,12 @@
         "parentId": "routes/admin/layout",
         "file": "routes/admin/enrollment-details.tsx",
         "path": "admin/enrollments/:id"
+      },
+      "routes/admin/enrollments/edit": {
+        "id": "routes/admin/enrollments/edit",
+        "parentId": "routes/admin/layout",
+        "file": "routes/admin/enrollments/edit.tsx",
+        "path": "admin/enrollments/:id/edit"
       },
       "routes/admin/courses": {
         "id": "routes/admin/courses",
@@ -396,6 +412,10 @@
               {
                 "file": "routes/admin/enrollment-details.tsx",
                 "path": "admin/enrollments/:id"
+              },
+              {
+                "file": "routes/admin/enrollments/edit.tsx",
+                "path": "admin/enrollments/:id/edit"
               },
               {
                 "file": "routes/admin/courses.tsx",

@@ -59,6 +59,7 @@ export type User = {
     status: "active" | "banned" | "suspended"
     createdAt: string
     lastActivity: string | null
+    profession?: string
 }
 
 const UserActions = React.memo(({ user }: { user: User }) => {
@@ -179,7 +180,7 @@ export const columns: ColumnDef<User>[] = [
         cell: ({ row }) => (
             <Link
                 to={`/admin/users/${row.original.id}`}
-                className="lowercase capitalize hover:underline font-medium text-primary"
+                className="capitalize hover:underline font-medium text-primary"
             >
                 {row.getValue("name")}
             </Link>
