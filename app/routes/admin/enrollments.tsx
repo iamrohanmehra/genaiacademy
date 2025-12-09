@@ -277,16 +277,42 @@ const EnrollmentTable = ({
             cell: ({ row }) => {
                 const enrollment = row.original
                 return (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-muted-foreground flex size-8 p-0 cursor-pointer"
-                        onClick={() => navigate(`/admin/enrollments/${enrollment.id}/edit`)}
-                        title="Edit Enrollment"
-                    >
-                        <ClipboardPen className="h-4 w-4" />
-                        <span className="sr-only">Edit Enrollment</span>
-                    </Button>
+                    <div className="flex items-center gap-1">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground flex size-8 p-0 cursor-pointer hover:text-foreground"
+                            onClick={() => navigate(`/admin/enrollments/${enrollment.id}/edit`)}
+                            title="Edit Enrollment"
+                        >
+                            <ClipboardPen className="h-4 w-4" />
+                            <span className="sr-only">Edit Enrollment</span>
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground flex size-8 p-0 cursor-pointer hover:text-foreground"
+                            onClick={() => navigate(`/admin/enrollments/${enrollment.id}/progress`)}
+                            title="View Progress"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="h-4 w-4"
+                            >
+                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+                                <path d="M22 12A10 10 0 0 0 12 2v10z" />
+                            </svg>
+                            <span className="sr-only">View Progress</span>
+                        </Button>
+                    </div>
                 )
             },
         },

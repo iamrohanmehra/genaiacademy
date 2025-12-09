@@ -5,7 +5,7 @@ import { useNavigate, Link, useParams } from "react-router"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { format } from "date-fns"
+import { format, isValid } from "date-fns"
 import { CalendarIcon, Loader2, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -423,7 +423,7 @@ export default function EditCoursePage() {
                                                                     !field.value && "text-muted-foreground"
                                                                 )}
                                                             >
-                                                                {field.value ? (
+                                                                {field.value && isValid(field.value) ? (
                                                                     format(field.value, "PPP")
                                                                 ) : (
                                                                     <span>Pick a date</span>
@@ -466,7 +466,7 @@ export default function EditCoursePage() {
                                                                     !field.value && "text-muted-foreground"
                                                                 )}
                                                             >
-                                                                {field.value ? (
+                                                                {field.value && isValid(field.value) ? (
                                                                     format(field.value, "PPP")
                                                                 ) : (
                                                                     <span>Pick a date</span>
