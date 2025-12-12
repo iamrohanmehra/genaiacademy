@@ -49,6 +49,7 @@ This is a **STRICTLY FRONTEND** repository.
 ### Navigation & Routing
 - Use `<Link>` from `react-router` for all internal navigation. **NEVER** use `<a>` tags for internal links as they cause full page reloads.
 - **Sidebar Logic**: **NEVER** hardcode `isActive: true` in sidebar navigation data. Expansion must be dynamic based on the current URL (use `useLocation`).
+- **Breadcrumbs**: Ensure breadcrumbs include the current active page as the last item. Use contextual labels for generic routes (e.g. rename "Create" -> "Create User" based on parent segment).
 
 ### UI & Accessibility
 - **High Contrast**: Ensure interactive elements (like checkboxes) have sufficient contrast against their background.
@@ -86,7 +87,10 @@ This is a **STRICTLY FRONTEND** repository.
 ### UI Patterns & Best Practices
 - **Forms**:
     - **Compact Layouts**: For settings or single-column forms, constrain width (e.g., `max-w-xl`) to prevent overly wide inputs on large screens.
-    - **Buttons**: In compact forms, use **Full Width** buttons (`w-full`) for the primary submit action to match the input width and create a solid visual block.
+    - **Buttons**:
+        - **Single Primary Action**: For creation or update forms (e.g. "Create User", "Edit Profile"), provide a **Single, Full-Width Button** (`w-full`) for the primary action.
+        - **Avoid Cancel Buttons**: Do not include "Cancel" buttons on full-page forms if they simply navigate back. Rely on Breadcrumbs or Browser Back.
+    - **Components**: Prefer using the composable `Field` family components (`~/components/ui/field`) for building form layouts over the standard Shadcn `FormItem`/`FormControl` structure where possible.
     - **Checkboxes**:
         - **Vertical**: Default choice for long lists or varying label lengths.
         - **Side-by-Side**: Preferred for pairs of short labels (e.g., "Notify Email", "Notify WhatsApp") in compact forms to save vertical space.
