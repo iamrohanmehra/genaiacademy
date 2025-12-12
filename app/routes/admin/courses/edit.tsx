@@ -54,8 +54,8 @@ const formSchema = z.object({
     payable: z.coerce.number().min(0, "Payable amount must be positive."),
     certificateFee: z.coerce.number().min(0, "Certificate fee must be positive."),
     limit: z.coerce.number().min(1, "Limit must be at least 1."),
-    startDate: z.date({ required_error: "Start date is required." }),
-    endDate: z.date({ required_error: "End date is required." }),
+    startDate: z.date(),
+    endDate: z.date(),
     status: z.enum(["private", "live", "inProgress", "completed"]),
     association: z.string().optional(),
     banner: z.string().url("Invalid URL").optional().or(z.literal("")),
@@ -96,7 +96,7 @@ export default function EditCoursePage() {
     const navigate = useNavigate()
 
     const queryClient = useQueryClient()
-    const form = useForm<z.infer<typeof formSchema>>({
+    const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: "",
@@ -353,7 +353,7 @@ export default function EditCoursePage() {
                                             <FormItem>
                                                 <FormLabel>Topic ID</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" {...field} />
+                                                    <Input type="number" {...field} value={field.value as number} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -507,7 +507,7 @@ export default function EditCoursePage() {
                                             <FormItem>
                                                 <FormLabel>Price</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" {...field} />
+                                                    <Input type="number" {...field} value={field.value as number} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -520,7 +520,7 @@ export default function EditCoursePage() {
                                             <FormItem>
                                                 <FormLabel>Payable Amount</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" {...field} />
+                                                    <Input type="number" {...field} value={field.value as number} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -533,7 +533,7 @@ export default function EditCoursePage() {
                                             <FormItem>
                                                 <FormLabel>Certificate Fee</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" {...field} />
+                                                    <Input type="number" {...field} value={field.value as number} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -546,7 +546,7 @@ export default function EditCoursePage() {
                                             <FormItem>
                                                 <FormLabel>Student Limit</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" {...field} />
+                                                    <Input type="number" {...field} value={field.value as number} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
