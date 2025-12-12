@@ -20,7 +20,7 @@ import { Label } from "~/components/ui/label"
 import { supabase } from "~/lib/supabase"
 import { api } from "~/lib/api.client"
 import { queryKeys } from "~/lib/query-keys"
-import type { Course } from "~/routes/admin/courses"
+import type { Course } from "~/types/course"
 
 interface DeleteCourseDialogProps {
     course: Course

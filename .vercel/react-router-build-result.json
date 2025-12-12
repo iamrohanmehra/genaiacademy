@@ -20,7 +20,6 @@
       "routes/admin/users-details": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/enrollments": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/enrollments/create": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
-      "routes/admin/enrollment-details": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/enrollments/edit": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/enrollments/progress": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
       "routes/admin/courses": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
@@ -130,15 +129,6 @@
         "parentId": "routes/admin/layout",
         "file": "app/routes/admin/enrollments/create.tsx",
         "path": "admin/enrollments/create",
-        "config": {
-          "runtime": "nodejs"
-        }
-      },
-      "routes/admin/enrollment-details": {
-        "id": "routes/admin/enrollment-details",
-        "parentId": "routes/admin/layout",
-        "file": "app/routes/admin/enrollment-details.tsx",
-        "path": "admin/enrollments/:id",
         "config": {
           "runtime": "nodejs"
         }
@@ -308,12 +298,6 @@
         "file": "routes/admin/enrollments/create.tsx",
         "path": "admin/enrollments/create"
       },
-      "routes/admin/enrollment-details": {
-        "id": "routes/admin/enrollment-details",
-        "parentId": "routes/admin/layout",
-        "file": "routes/admin/enrollment-details.tsx",
-        "path": "admin/enrollments/:id"
-      },
       "routes/admin/enrollments/edit": {
         "id": "routes/admin/enrollments/edit",
         "parentId": "routes/admin/layout",
@@ -424,10 +408,6 @@
               {
                 "file": "routes/admin/enrollments/create.tsx",
                 "path": "admin/enrollments/create"
-              },
-              {
-                "file": "routes/admin/enrollment-details.tsx",
-                "path": "admin/enrollments/:id"
               },
               {
                 "file": "routes/admin/enrollments/edit.tsx",

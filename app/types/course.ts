@@ -22,3 +22,30 @@ export type Course = {
     createdAt: string
     updatedAt: string
 }
+
+export type CourseSection = {
+    id: string
+    courseId: string
+    title: string
+    order: number
+    createdAt?: string
+    updatedAt?: string
+}
+
+export type CourseContent = {
+    id: string
+    sectionId: string
+    courseId: string
+    title: string
+    type: "video" | "liveClass" | "assignment" | "article"
+    desc?: string
+    videoLink?: string
+    order: number
+    xp?: number
+    accessOn?: number
+    accessTill?: number
+    accessOnDate?: string
+    accessTillDate?: string
+    createdAt?: string
+    updatedAt?: string
+}

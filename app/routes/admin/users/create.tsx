@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useNavigate } from "react-router"
@@ -10,15 +10,6 @@ import { Loader2 } from "lucide-react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { Button } from "~/components/ui/button"
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "~/components/ui/form"
 import { Input } from "~/components/ui/input"
 import {
     Select,
@@ -27,7 +18,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from "~/components/ui/select"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
+import {
+    Field,
+    FieldLabel,
+    FieldDescription,
+    FieldError,
+    FieldGroup,
+} from "~/components/ui/field"
 import { api, ApiError } from "~/lib/api.client"
 import { queryKeys } from "~/lib/query-keys"
 import { supabase } from "~/lib/supabase"
@@ -43,20 +40,18 @@ const formSchema = z.object({
         message: "Password must be at least 6 characters.",
     }).optional().or(z.literal("")),
     mobile: z.string().optional(),
-    role: z.enum(["student", "operations", "admin"], {
-        required_error: "Please select a role.",
-    }),
-    status: z.enum(["active", "banned"], {
-        required_error: "Please select a status.",
-    }),
-    globalXp: z.coerce.number().min(0),
+    role: z.enum(["student", "operations", "admin"]),
+    status: z.enum(["active", "banned"]),
+    globalXp: z.number().min(0),
 })
+
+type FormValues = z.infer<typeof formSchema>
 
 export default function CreateUserPage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
 
-    const form = useForm<z.infer<typeof formSchema>>({
+    const { register, control, handleSubmit, formState: { errors } } = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
@@ -70,7 +65,7 @@ export default function CreateUserPage() {
     })
 
     const { mutate: createUser, isPending } = useMutation({
-        mutationFn: async (values: z.infer<typeof formSchema>) => {
+        mutationFn: async (values: FormValues) => {
             const { data: { session } } = await supabase.auth.getSession()
             const token = session?.access_token
             if (!token) throw new ApiError("Unauthorized", 401)
@@ -86,8 +81,6 @@ export default function CreateUserPage() {
                     mobile: values.mobile || undefined,
                 }
 
-                // We use api.post but we don't strictly need the token for signup. 
-                // However, passing it doesn't hurt.
                 const signupResponse = await api.post<{ success: boolean; data: { user: { id: string } } }>(
                     "/api/auth/signup",
                     signupPayload
@@ -96,8 +89,6 @@ export default function CreateUserPage() {
                 const userId = signupResponse.data.user.id
 
                 // 2. Update user details (Role, Status, GlobalXP) via Admin API
-                // Only update fields that differ from default signup (which sets role=student, status=active)
-                // or fields that signup didn't handle (globalXp)
                 const updatePayload = {
                     role: values.role,
                     status: values.status,
@@ -111,8 +102,6 @@ export default function CreateUserPage() {
                 )
             } else {
                 // If no password, use the Admin Create User endpoint
-                // This assumes the backend handles "create without password" correctly
-                // (e.g. for invite-only flows where user sets password later)
                 const payload = {
                     ...values,
                     password: undefined,
@@ -134,151 +123,107 @@ export default function CreateUserPage() {
         },
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    function onSubmit(values: FormValues) {
         createUser(values)
     }
 
     return (
-        <div className="flex-1 space-y-4 p-8 pt-6">
-            <div className="flex items-center justify-between space-y-2">
-                <h2 className="text-3xl font-bold tracking-tight">Create User</h2>
+        <div className="flex flex-1 flex-col gap-8 p-8 max-w-xl mx-auto w-full">
+            <div className="flex flex-col gap-6">
+                <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-1">
+                        <h1 className="text-3xl font-bold tracking-tight">Create User</h1>
+                        <p className="text-muted-foreground">Enter the details of the new user.</p>
+                    </div>
+                </div>
             </div>
-            <Card>
-                <CardHeader>
-                    <CardTitle>User Details</CardTitle>
-                    <CardDescription>
-                        Enter the details of the new user.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                            <div className="grid gap-4 md:grid-cols-2">
-                                <FormField
-                                    control={form.control}
-                                    name="name"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="John Doe" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Email</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="john@example.com" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Password</FormLabel>
-                                            <FormControl>
-                                                <Input type="password" placeholder="******" {...field} />
-                                            </FormControl>
-                                            <FormDescription>
-                                                Optional. Leave blank to create without a password (user can reset later).
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="mobile"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Mobile</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="+1234567890" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="role"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Role</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a role" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="student">Student</SelectItem>
-                                                    <SelectItem value="operations">Operations</SelectItem>
-                                                    <SelectItem value="admin">Admin</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="status"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Status</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a status" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    <SelectItem value="active">Active</SelectItem>
-                                                    <SelectItem value="banned">Banned</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                                <FormField
-                                    control={form.control}
-                                    name="globalXp"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Global XP</FormLabel>
-                                            <FormControl>
-                                                <Input type="number" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </div>
-                            <div className="flex justify-end space-x-4">
-                                <Button variant="outline" type="button" onClick={() => navigate("/admin/users")}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit" disabled={isPending}>
-                                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    Create User
-                                </Button>
-                            </div>
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pb-10">
+                <FieldGroup>
+                    <Field>
+                        <FieldLabel>Name</FieldLabel>
+                        <Input placeholder="John Doe" {...register("name")} />
+                        <FieldError errors={[errors.name]} />
+                    </Field>
+
+                    <Field>
+                        <FieldLabel>Email</FieldLabel>
+                        <Input placeholder="john@example.com" {...register("email")} />
+                        <FieldError errors={[errors.email]} />
+                    </Field>
+
+                    <Field>
+                        <FieldLabel>Password</FieldLabel>
+                        <Input type="password" placeholder="******" {...register("password")} />
+                        <FieldDescription>
+                            Optional. Leave blank to create without a password (user can reset later).
+                        </FieldDescription>
+                        <FieldError errors={[errors.password]} />
+                    </Field>
+
+                    <Field>
+                        <FieldLabel>Mobile</FieldLabel>
+                        <Input placeholder="+1234567890" {...register("mobile")} />
+                        <FieldError errors={[errors.mobile]} />
+                    </Field>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <Controller
+                            control={control}
+                            name="role"
+                            render={({ field }) => (
+                                <Field>
+                                    <FieldLabel>Role</FieldLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a role" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="student">Student</SelectItem>
+                                            <SelectItem value="operations">Operations</SelectItem>
+                                            <SelectItem value="admin">Admin</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FieldError errors={[errors.role]} />
+                                </Field>
+                            )}
+                        />
+
+                        <Controller
+                            control={control}
+                            name="status"
+                            render={({ field }) => (
+                                <Field>
+                                    <FieldLabel>Status</FieldLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select a status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="active">Active</SelectItem>
+                                            <SelectItem value="banned">Banned</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <FieldError errors={[errors.status]} />
+                                </Field>
+                            )}
+                        />
+                    </div>
+
+                    <Field>
+                        <FieldLabel>Global XP</FieldLabel>
+                        <Input type="number" {...register("globalXp", { valueAsNumber: true })} />
+                        <FieldError errors={[errors.globalXp]} />
+                    </Field>
+
+                    <div className="pt-4">
+                        <Button type="submit" disabled={isPending} size="lg" className="w-full">
+                            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Create User
+                        </Button>
+                    </div>
+                </FieldGroup>
+            </form>
         </div>
     )
 }

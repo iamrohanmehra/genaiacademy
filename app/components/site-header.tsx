@@ -27,12 +27,12 @@ export function SiteHeader() {
   if (pathSegments.length === 2 && pathSegments[0] === "admin" && pathSegments[1] === "dashboard") {
     segmentsToRender = ["admin"]
   } else {
-    // Check if last segment is create or edit
-    const lastSegment = pathSegments[pathSegments.length - 1]
-    if (["create", "edit"].includes(lastSegment)) {
-      segmentsToRender = pathSegments.slice(0, -1)
-      forceLinkIndex = segmentsToRender.length - 1
-    }
+    // Check if last segment is create or edit (Removed to show current page)
+    // const lastSegment = pathSegments[pathSegments.length - 1]
+    // if (["create", "edit"].includes(lastSegment)) {
+    //   segmentsToRender = pathSegments.slice(0, -1)
+    //   forceLinkIndex = segmentsToRender.length - 1
+    // }
   }
 
   return (

@@ -180,8 +180,32 @@ export function BreadcrumbResolver({ segment, index, segments, isLast }: Breadcr
     }
 
     // 4. Default: Static Text
-    // Format: "course-content" -> "Course Content"
-    const title = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ")
+    let title = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ")
+
+    // Contextual naming for Create/Edit
+    const previousSegment = segments[index - 1]
+    if (segment === "create" && previousSegment) {
+        if (previousSegment === "users") title = "Create User"
+        if (previousSegment === "courses") title = "Create Course"
+        if (previousSegment === "enrollments") title = "Create Enrollment"
+    }
+    if (segment === "edit" && previousSegment) {
+        // usually /admin/users/:id/edit -> previous is ID.
+        // If structure is /admin/users/edit (unlikely), but let's handle if so.
+        // Actually usually it's /admin/courses/:id/edit
+        // effectively 'edit' comes after an ID.
+        // The ID resolver handles the ID name.
+        // 'Edit' just says 'Edit'. 'Edit Course' might be better but 'Edit' is standard.
+        // Let's stick to 'Edit' or maybe 'Edit Details'?
+        // Given 'create' gets 'Create User', 'edit' could be 'Edit User' if we knew the type.
+        // But previous segment is an ID (uuid). We can check index-2.
+        const typeSegment = segments[index - 2]
+        if (typeSegment === "users") title = "Edit User"
+        if (typeSegment === "courses") title = "Edit Course"
+        // Enrollments usually don't have /edit route? They do /admin/enrollments/:id/edit
+        if (typeSegment === "enrollments") title = "Edit Enrollment"
+    }
+
     const href = "/" + segments.slice(0, index + 1).join("/")
 
     return (
