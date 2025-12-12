@@ -1,22 +1,13 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "~/lib/api.client";
 import { queryKeys } from "~/lib/query-keys";
 import { supabase } from "~/lib/supabase";
-import { useNavigate, Link } from "react-router";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-    FormDescription,
-} from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import {
     Select,
@@ -26,8 +17,15 @@ import {
     SelectValue,
 } from "~/components/ui/select";
 import { Checkbox } from "~/components/ui/checkbox";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import {
+    Field,
+    FieldLabel,
+    FieldDescription,
+    FieldError,
+    FieldGroup,
+    FieldContent,
+} from "~/components/ui/field";
 
 const formSchema = z.object({
     userId: z.string().uuid({ message: "Invalid User ID" }),
@@ -41,7 +39,7 @@ export default function CreateEnrollmentPage() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const form = useForm({
+    const { register, control, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             userId: "",
@@ -60,15 +58,6 @@ export default function CreateEnrollmentPage() {
             if (!token) {
                 throw new ApiError("Unauthorized", 401);
             }
-
-            // Convert amount to paise/cents if needed, but schema says number.
-            // API docs say "Amount in paise/cents".
-            // Assuming input is in major units (e.g. Rupees) and we convert to minor (Paise) * 100?
-            // Or input is raw?
-            // Let's assume input is raw for now as per "Amount in paise/cents" description in docs, 
-            // but usually admins enter Rupees. 
-            // Let's stick to raw input to be safe with API docs, or maybe add a note.
-            // Actually, let's assume the admin enters the value in paise directly for now to match API 1:1.
 
             return api.createEnrollment(values, token);
         },
@@ -92,127 +81,88 @@ export default function CreateEnrollmentPage() {
     }
 
     return (
-        <div className="p-6 space-y-6 max-w-2xl mx-auto">
-            <div className="flex items-center gap-4">
-                <Button variant="outline" size="icon" asChild>
-                    <Link to="/admin/enrollments">
-                        <ArrowLeft className="h-4 w-4" />
-                    </Link>
-                </Button>
-                <h1 className="text-2xl font-bold">Create Enrollment</h1>
+        <div className="flex flex-1 flex-col gap-8 p-8 max-w-xl mx-auto w-full">
+            <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-1">
+                    <h1 className="text-3xl font-bold tracking-tight">Create Enrollment</h1>
+                    <p className="text-muted-foreground">Enroll a user in a course manually.</p>
+                </div>
             </div>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>New Enrollment Details</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                            <FormField
-                                control={form.control}
-                                name="userId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>User ID</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="User UUID" {...field} />
-                                        </FormControl>
-                                        <FormDescription>
-                                            The UUID of the user to enroll.
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pb-10">
+                <FieldGroup>
+                    <Field>
+                        <FieldLabel>User ID</FieldLabel>
+                        <Input placeholder="User UUID" {...register("userId")} />
+                        <FieldDescription>
+                            The UUID of the user to enroll.
+                        </FieldDescription>
+                        <FieldError errors={[errors.userId]} />
+                    </Field>
 
-                            <FormField
-                                control={form.control}
-                                name="courseId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Course ID</FormLabel>
-                                        <FormControl>
-                                            <Input placeholder="Course UUID" {...field} />
-                                        </FormControl>
-                                        <FormDescription>
-                                            The UUID of the course.
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                    <Field>
+                        <FieldLabel>Course ID</FieldLabel>
+                        <Input placeholder="Course UUID" {...register("courseId")} />
+                        <FieldDescription>
+                            The UUID of the course.
+                        </FieldDescription>
+                        <FieldError errors={[errors.courseId]} />
+                    </Field>
 
-                            <FormField
-                                control={form.control}
-                                name="amountPaid"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Amount Paid (in paise)</FormLabel>
-                                        <FormControl>
-                                            <Input type="number" placeholder="0" {...field} />
-                                        </FormControl>
-                                        <FormDescription>
-                                            e.g., 499900 for ₹4999.00
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                    <Field>
+                        <FieldLabel>Amount Paid (in paise)</FieldLabel>
+                        <Input type="number" placeholder="0" {...register("amountPaid")} />
+                        <FieldDescription>
+                            e.g., 499900 for ₹4999.00
+                        </FieldDescription>
+                        <FieldError errors={[errors.amountPaid]} />
+                    </Field>
 
-                            <FormField
-                                control={form.control}
-                                name="hasPaid"
-                                render={({ field }) => (
-                                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                                        <FormControl>
-                                            <Checkbox
-                                                checked={field.value}
-                                                onCheckedChange={field.onChange}
-                                            />
-                                        </FormControl>
-                                        <div className="space-y-1 leading-none">
-                                            <FormLabel>
-                                                Payment Received
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Check if the user has already paid.
-                                            </FormDescription>
-                                        </div>
-                                    </FormItem>
-                                )}
-                            />
+                    <Controller
+                        control={control}
+                        name="hasPaid"
+                        render={({ field }) => (
+                            <Field orientation="horizontal">
+                                <Checkbox
+                                    id="hasPaid"
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                />
+                                <FieldContent>
+                                    <FieldLabel htmlFor="hasPaid">Payment Received</FieldLabel>
+                                </FieldContent>
+                            </Field>
+                        )}
+                    />
 
-                            <FormField
-                                control={form.control}
-                                name="status"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Status</FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select status" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                <SelectItem value="active">Active</SelectItem>
-                                                <SelectItem value="banned">Banned</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                    <Controller
+                        control={control}
+                        name="status"
+                        render={({ field }) => (
+                            <Field>
+                                <FieldLabel>Status</FieldLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="active">Active</SelectItem>
+                                        <SelectItem value="banned">Banned</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FieldError errors={[errors.status]} />
+                            </Field>
+                        )}
+                    />
 
-                            <Button type="submit" disabled={isPending}>
-                                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Create Enrollment
-                            </Button>
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
+                    <div className="pt-4">
+                        <Button type="submit" disabled={isPending} size="lg" className="w-full">
+                            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Create Enrollment
+                        </Button>
+                    </div>
+                </FieldGroup>
+            </form>
         </div>
     );
 }
