@@ -19,7 +19,7 @@ export default function Page() {
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-14 shrink-0 items-center gap-2">
-          <div className="flex flex-1 items-center gap-2 px-3">
+          <div className="flex flex-1 items-center gap-2 px-2 md:px-3">
             <SidebarTrigger />
             <Separator
               orientation="vertical"
@@ -39,7 +39,7 @@ export default function Page() {
             <NavActions />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 px-4 py-10">
+        <div className="flex flex-1 flex-col gap-4 px-2 py-10 md:px-4">
           <div className="bg-muted/50 mx-auto h-24 w-full max-w-3xl rounded-xl" />
           <div className="bg-muted/50 mx-auto h-full w-full max-w-3xl rounded-xl" />
         </div>

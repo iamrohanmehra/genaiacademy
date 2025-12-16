@@ -38,7 +38,7 @@ export default function AdminLayout() {
             <AppSidebar />
             <SidebarInset>
                 <SiteHeader />
-                <div className="flex flex-1 flex-col gap-4 px-4 pb-10">
+                <div className="flex flex-1 flex-col gap-4 px-2 md:px-4 pb-10">
                     <Outlet />
                 </div>
             </SidebarInset>

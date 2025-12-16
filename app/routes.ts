@@ -9,7 +9,7 @@ export default [
     // Admin Routes with Persistent Layout
     layout("routes/admin/layout.tsx", [
         route("admin/dashboard", "routes/admin/dashboard.tsx"),
-        // Settings route removed as per request
+        route("admin/settings", "routes/admin/settings.tsx"),
         route("admin/users", "routes/admin/users.tsx"),
         route("admin/search", "routes/admin/search.tsx"),
         route("admin/users/create", "routes/admin/users/create.tsx"),

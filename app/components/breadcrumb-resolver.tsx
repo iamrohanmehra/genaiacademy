@@ -96,6 +96,30 @@ export function BreadcrumbResolver({ segment, index, segments, isLast }: Breadcr
             })
             if (course) resolvedName = course.title
             isLoading = loadingContent
+
+            // Check if next segment is "content" (i.e. we are at /admin/courses/:id/content)
+            // If so, the Course Name breadcrumb (this segment) currently points to /admin/courses/:id (404).
+            // We want it to point to /admin/enrollments?courseId=... 
+            // Note: segments[index + 1] checks the *next* segment in the full URL path array.
+            if (segments[index + 1] === "content") {
+                // Return a specific breadcrumb item heavily customized for this case
+                return (
+                    <BreadcrumbItem>
+                        {isLoading ? (
+                            <span className="flex items-center gap-1 opacity-50">
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                                Loading...
+                            </span>
+                        ) : (
+                            <BreadcrumbLink asChild>
+                                <Link to={`/admin/enrollments?courseId=${segment}`} className="max-w-[150px] truncate md:max-w-none block">
+                                    {resolvedName}
+                                </Link>
+                            </BreadcrumbLink>
+                        )}
+                    </BreadcrumbItem>
+                )
+            }
         } else if (previousSegment === "users") {
             const { data: user, isLoading: loadingContent } = useQuery({
                 queryKey: queryKeys.users.detail(segment),
@@ -204,6 +228,10 @@ export function BreadcrumbResolver({ segment, index, segments, isLast }: Breadcr
         if (typeSegment === "courses") title = "Edit Course"
         // Enrollments usually don't have /edit route? They do /admin/enrollments/:id/edit
         if (typeSegment === "enrollments") title = "Edit Enrollment"
+    }
+
+    if (segment === "content" && segments[index - 2] === "courses") {
+        title = "Content Manager"
     }
 
     const href = "/" + segments.slice(0, index + 1).join("/")

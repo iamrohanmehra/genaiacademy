@@ -49,7 +49,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
     return (
         <div className="rounded-md border border-input bg-transparent shadow-xs">
             <div className="flex flex-wrap items-center gap-1 border-b bg-muted/50 p-1">
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={editor.isActive('bold')}
                     onPressedChange={() => editor.chain().focus().toggleBold().run()}
@@ -57,7 +57,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                 >
                     <Bold className="h-4 w-4" />
                 </Toggle>
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={editor.isActive('italic')}
                     onPressedChange={() => editor.chain().focus().toggleItalic().run()}
@@ -65,7 +65,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                 >
                     <Italic className="h-4 w-4" />
                 </Toggle>
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={editor.isActive('strike')}
                     onPressedChange={() => editor.chain().focus().toggleStrike().run()}
@@ -74,7 +74,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                     <Strikethrough className="h-4 w-4" />
                 </Toggle>
                 <Separator orientation="vertical" className="mx-1 h-6" />
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={editor.isActive('heading', { level: 1 })}
                     onPressedChange={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -82,7 +82,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                 >
                     <Heading1 className="h-4 w-4" />
                 </Toggle>
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={editor.isActive('heading', { level: 2 })}
                     onPressedChange={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
@@ -90,7 +90,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                 >
                     <Heading2 className="h-4 w-4" />
                 </Toggle>
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={editor.isActive('heading', { level: 3 })}
                     onPressedChange={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
@@ -99,7 +99,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                     <Heading3 className="h-4 w-4" />
                 </Toggle>
                 <Separator orientation="vertical" className="mx-1 h-6" />
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={editor.isActive('bulletList')}
                     onPressedChange={() => editor.chain().focus().toggleBulletList().run()}
@@ -107,7 +107,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                 >
                     <List className="h-4 w-4" />
                 </Toggle>
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={editor.isActive('orderedList')}
                     onPressedChange={() => editor.chain().focus().toggleOrderedList().run()}
@@ -116,7 +116,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                     <ListOrdered className="h-4 w-4" />
                 </Toggle>
                 <Separator orientation="vertical" className="mx-1 h-6" />
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={editor.isActive('blockquote')}
                     onPressedChange={() => editor.chain().focus().toggleBlockquote().run()}
@@ -124,7 +124,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                 >
                     <Quote className="h-4 w-4" />
                 </Toggle>
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={editor.isActive('codeBlock')}
                     onPressedChange={() => editor.chain().focus().toggleCodeBlock().run()}
@@ -133,7 +133,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                     <Code className="h-4 w-4" />
                 </Toggle>
                 <Separator orientation="vertical" className="mx-1 h-6" />
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={false}
                     onPressedChange={() => editor.chain().focus().undo().run()}
@@ -142,7 +142,7 @@ export function TiptapEditor({ value, onChange }: TiptapEditorProps) {
                 >
                     <Undo className="h-4 w-4" />
                 </Toggle>
-                <Toggle
+                <Toggle type="button"
                     size="sm"
                     pressed={false}
                     onPressedChange={() => editor.chain().focus().redo().run()}
